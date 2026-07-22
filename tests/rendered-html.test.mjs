@@ -38,14 +38,19 @@ test("renders the daily digest", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>AI Engineering Daily/);
-  assert.match(html, /今日概览/);
-  assert.match(html, /精选内容/);
+  assert.match(html, new RegExp(escapeRegExp(latestDigest.overview)));
+  assert.match(html, /搜索标题、来源或标签/);
 
   if (latestDigest.items.length === 0) {
     assert.match(html, /首期内容准备中/);
   } else {
     assert.doesNotMatch(html, /首期内容准备中/);
     assert.match(html, new RegExp(escapeRegExp(latestDigest.items[0].title)));
+    assert.match(
+      html,
+      new RegExp(`data-source-type="${escapeRegExp(latestDigest.items[0].sourceType)}"`),
+    );
+    assert.match(html, /aria-label="标签筛选"/);
     assert.match(
       html,
       new RegExp(`第 ${String(latestDigest.issue).padStart(3, "0")} 期`),

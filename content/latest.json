@@ -7,6 +7,7 @@
   "items": [
     {
       "category": "代码维护",
+      "sourceType": "arxiv",
       "source": "Alex Mathai 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -23,6 +24,7 @@
     },
     {
       "category": "Agent 调试",
+      "sourceType": "arxiv",
       "source": "Kunlun Zhu 等",
       "publishedAt": "2026-07-21",
       "readTime": "10 min",
@@ -39,6 +41,7 @@
     },
     {
       "category": "Agent 安全",
+      "sourceType": "arxiv",
       "source": "Akansha Shukla 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -55,6 +58,7 @@
     },
     {
       "category": "上下文工程",
+      "sourceType": "arxiv",
       "source": "Yuhang Wang 等",
       "publishedAt": "2026-07-21",
       "readTime": "8 min",
@@ -71,6 +75,7 @@
     },
     {
       "category": "程序修复",
+      "sourceType": "arxiv",
       "source": "Tianyue Jiang 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -87,6 +92,7 @@
     },
     {
       "category": "需求追踪",
+      "sourceType": "arxiv",
       "source": "Mingyu Chen 等",
       "publishedAt": "2026-07-21",
       "readTime": "10 min",
@@ -103,6 +109,7 @@
     },
     {
       "category": "软件测试",
+      "sourceType": "arxiv",
       "source": "Ruogu Yang 等",
       "publishedAt": "2026-07-21",
       "readTime": "8 min",
@@ -119,6 +126,7 @@
     },
     {
       "category": "科学代码",
+      "sourceType": "arxiv",
       "source": "Weifeng Sun 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -135,6 +143,7 @@
     },
     {
       "category": "推理优化",
+      "sourceType": "arxiv",
       "source": "Yu-Yang Qian 等",
       "publishedAt": "2026-07-21",
       "readTime": "8 min",
@@ -151,6 +160,7 @@
     },
     {
       "category": "Skill 生命周期",
+      "sourceType": "arxiv",
       "source": "Haodi Fan、Zucong Lan",
       "publishedAt": "2026-07-21",
       "readTime": "10 min",
@@ -167,6 +177,7 @@
     },
     {
       "category": "Agent 交付",
+      "sourceType": "blog",
       "source": "Harness、Jyoti Bansal",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -183,6 +194,7 @@
     },
     {
       "category": "平台工程",
+      "sourceType": "blog",
       "source": "CNCF、Lakmal Warusawithana",
       "publishedAt": "2026-07-21",
       "readTime": "11 min",

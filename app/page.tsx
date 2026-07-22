@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { LuSearch } from "react-icons/lu";
 import latestDigest from "@/content/latest.json";
+import { SourceMark } from "./source-mark";
 
 type Story = {
   category: string;
+  sourceType: string;
   source: string;
   readTime: string;
   title: string;
@@ -16,6 +19,26 @@ type Story = {
 
 const stories = latestDigest.items as Story[];
 
+function getFeaturedTags(items: Story[], limit = 8) {
+  const stats = new Map<string, { count: number; order: number }>();
+  let order = 0;
+
+  items.forEach((story) => {
+    story.tags.forEach((tag) => {
+      const current = stats.get(tag);
+      if (current) current.count += 1;
+      else stats.set(tag, { count: 1, order: order++ });
+    });
+  });
+
+  return [...stats.entries()]
+    .sort((left, right) => right[1].count - left[1].count || left[1].order - right[1].order)
+    .slice(0, limit)
+    .map(([tag]) => tag);
+}
+
+const featuredTags = getFeaturedTags(stories);
+
 function formatDigestDate(date: string | null) {
   if (!date) return null;
   const [year, month, day] = date.split("-").map(Number);
@@ -24,23 +47,28 @@ function formatDigestDate(date: string | null) {
 
 export default function Home() {
   const [query, setQuery] = useState("");
+  const [activeTag, setActiveTag] = useState<string | null>(null);
   const digestDate = formatDigestDate(latestDigest.date);
+  const visibleTags =
+    activeTag && !featuredTags.includes(activeTag)
+      ? [activeTag, ...featuredTags.slice(0, -1)]
+      : featuredTags;
 
-  const filteredStories = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return stories.filter((story) => {
-      return (
-        !normalized ||
-        [story.category, story.title, story.summary, story.source, ...story.tags]
-          .join(" ")
-          .toLowerCase()
-          .includes(normalized)
-      );
-    });
-  }, [query]);
+  const normalized = query.trim().toLowerCase();
+  const filteredStories = stories.filter((story) => {
+    const tagMatch = !activeTag || story.tags.includes(activeTag);
+    const queryMatch =
+      !normalized ||
+      [story.category, story.sourceType, story.title, story.summary, story.source, ...story.tags]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalized);
+    return tagMatch && queryMatch;
+  });
 
   return (
     <main>
+      <h1 className="sr-only">AI Engineering Daily</h1>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="AI Engineering Daily 首页">
           AI Engineering Daily
@@ -52,23 +80,46 @@ export default function Home() {
         <div className="header-meta">每天 09:30 更新</div>
       </header>
 
-      <section className="editor-note" id="top">
-        <h2>今日概览</h2>
-        <p>{latestDigest.overview}</p>
-      </section>
-
       <section className="digest" id="digest">
-        <div className="section-header">
-          <h2>精选内容</h2>
-          <span>
-            {latestDigest.issue > 0 && digestDate
-              ? `第 ${String(latestDigest.issue).padStart(3, "0")} 期 · ${digestDate} · ${stories.length} 篇`
-              : "首期准备中"}
-          </span>
+        <div className="digest-intro" id="top">
+          <div className="issue-block">
+            <strong>
+              {latestDigest.issue > 0
+                ? `第 ${String(latestDigest.issue).padStart(3, "0")} 期`
+                : "首期准备中"}
+            </strong>
+            <span>
+              {latestDigest.issue > 0 && digestDate
+                ? `${digestDate} · ${stories.length} 篇`
+                : "每天 09:30 更新"}
+            </span>
+          </div>
+          <p>{latestDigest.overview}</p>
         </div>
         <div className="toolbar">
+          <div className="tag-filters" aria-label="标签筛选">
+            <button
+              type="button"
+              className={activeTag === null ? "selected" : ""}
+              aria-pressed={activeTag === null}
+              onClick={() => setActiveTag(null)}
+            >
+              全部
+            </button>
+            {visibleTags.map((tag) => (
+              <button
+                type="button"
+                key={tag}
+                className={activeTag === tag ? "selected" : ""}
+                aria-pressed={activeTag === tag}
+                onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
           <label className="search-box">
-            <span>⌕</span>
+            <LuSearch aria-hidden="true" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -83,11 +134,24 @@ export default function Home() {
             <article className="story" key={story.url}>
               <div className="story-rank">{String(index + 1).padStart(2, "0")}</div>
               <div className="story-body">
-                <div className="story-kicker">
-                  <span>{story.category}</span>
-                  <span>{story.source}</span>
-                  <span>{story.readTime}</span>
-                  {story.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                <div className="story-meta">
+                  <SourceMark type={story.sourceType} />
+                  <span className="meta-item story-topic">{story.category}</span>
+                  <span className="meta-item">{story.source}</span>
+                  <span className="meta-item">{story.readTime}</span>
+                  <div className="story-tags" aria-label="内容标签">
+                    {story.tags.map((tag) => (
+                      <button
+                        type="button"
+                        key={tag}
+                        className={activeTag === tag ? "selected" : ""}
+                        aria-pressed={activeTag === tag}
+                        onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <h2>
                   <a href={story.url} target="_blank" rel="noreferrer">{story.title}</a>

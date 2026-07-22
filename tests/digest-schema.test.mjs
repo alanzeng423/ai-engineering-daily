@@ -13,6 +13,7 @@ function createDigest(category = "Agent 可靠性") {
     items: [
       {
         category,
+        sourceType: "arxiv",
         source: "Example Engineering",
         publishedAt: "2026-07-21",
         readTime: "8 min",
@@ -33,4 +34,10 @@ test("accepts a flexible content-specific topic", () => {
 test("rejects a missing or overly long topic", () => {
   assert.match(validateDigest(createDigest(""))[0], /category/);
   assert.match(validateDigest(createDigest("过".repeat(41)))[0], /category/);
+});
+
+test("rejects an unsupported source platform", () => {
+  const digest = createDigest();
+  digest.items[0].sourceType = "search-result";
+  assert.match(validateDigest(digest)[0], /sourceType/);
 });
