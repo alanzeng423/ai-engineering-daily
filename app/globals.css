@@ -53,19 +53,7 @@ nav a:hover, nav a.active { color: var(--black); }
 .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; }
 .section-header h2 { font-size: 24px; letter-spacing: -.02em; }
 .section-header span { font-size: 13px; color: var(--muted); }
-.toolbar { display: flex; justify-content: space-between; gap: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--black); }
-.filters { display: flex; flex-wrap: wrap; gap: 6px; }
-.filters button {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #ffffff;
-  padding: 7px 13px;
-  font-size: 13px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.filters button:hover { border-color: var(--subtle); color: var(--black); }
-.filters button.selected { background: var(--black); color: #ffffff; border-color: var(--black); }
+.toolbar { display: flex; justify-content: flex-end; padding-bottom: 18px; border-bottom: 1px solid var(--black); }
 .search-box { width: 250px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); }
 .search-box span { font-size: 18px; }
 .search-box input { width: 100%; border: 0; outline: 0; background: transparent; padding: 7px 0; font-size: 13px; }

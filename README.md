@@ -38,6 +38,10 @@ The website renders only validated data from `content/latest.json`. Each issue
 is also stored in `content/digests/YYYY-MM-DD.json`, while
 `content/index.json` tracks the available dates.
 
+The broad editorial areas overlap and define discovery scope rather than a
+fixed taxonomy. Each story uses a concise, content-specific primary topic and
+flexible cross-cutting tags.
+
 To validate and publish a generated draft:
 
 ```bash

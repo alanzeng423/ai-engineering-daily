@@ -16,8 +16,6 @@ type Story = {
 
 const stories = latestDigest.items as Story[];
 
-const filters = ["全部", "LLM", "Agent", "Coding Agent", "AI4SE", "SE"];
-
 function formatDigestDate(date: string | null) {
   if (!date) return null;
   const [year, month, day] = date.split("-").map(Number);
@@ -25,27 +23,21 @@ function formatDigestDate(date: string | null) {
 }
 
 export default function Home() {
-  const [activeFilter, setActiveFilter] = useState("全部");
   const [query, setQuery] = useState("");
   const digestDate = formatDigestDate(latestDigest.date);
 
   const filteredStories = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return stories.filter((story) => {
-      const categoryMatch =
-        activeFilter === "全部" ||
-        (activeFilter === "SE"
-          ? story.category === "SOFTWARE ENGINEERING"
-          : story.category.toLowerCase().includes(activeFilter.toLowerCase()));
-      const queryMatch =
+      return (
         !normalized ||
-        [story.title, story.summary, story.source, ...story.tags]
+        [story.category, story.title, story.summary, story.source, ...story.tags]
           .join(" ")
           .toLowerCase()
-          .includes(normalized);
-      return categoryMatch && queryMatch;
+          .includes(normalized)
+      );
     });
-  }, [activeFilter, query]);
+  }, [query]);
 
   return (
     <main>
@@ -75,17 +67,6 @@ export default function Home() {
           </span>
         </div>
         <div className="toolbar">
-          <div className="filters" aria-label="主题筛选">
-            {filters.map((filter) => (
-              <button
-                key={filter}
-                className={activeFilter === filter ? "selected" : ""}
-                onClick={() => setActiveFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
           <label className="search-box">
             <span>⌕</span>
             <input
@@ -130,7 +111,7 @@ export default function Home() {
       <footer id="about">
         <div className="brand footer-brand">AI Engineering Daily</div>
         <p>每天 09:30 更新</p>
-        <p className="footer-note">LLM · Agent · Coding Agent · SE · AI4SE</p>
+        <p className="footer-note">AI research and engineering</p>
       </footer>
     </main>
   );

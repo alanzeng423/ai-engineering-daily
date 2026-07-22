@@ -1,13 +1,5 @@
 import { readFile } from "node:fs/promises";
 
-export const DIGEST_CATEGORIES = [
-  "LLM",
-  "AGENT",
-  "CODING AGENT",
-  "SOFTWARE ENGINEERING",
-  "AI4SE",
-];
-
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function isPlainObject(value) {
@@ -76,8 +68,8 @@ export function validateDigest(digest) {
       errors.push(`${path} 必须是一个对象`);
       return;
     }
-    if (!DIGEST_CATEGORIES.includes(item.category)) {
-      errors.push(`${path}.category 必须是受支持的主题`);
+    if (!hasText(item.category, 2, 40)) {
+      errors.push(`${path}.category 必须是 2–40 个字符的主题标签`);
     }
     if (!hasText(item.source, 2, 120)) errors.push(`${path}.source 长度不合法`);
     if (!hasText(item.readTime, 1, 30)) errors.push(`${path}.readTime 长度不合法`);
