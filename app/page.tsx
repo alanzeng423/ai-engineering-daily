@@ -86,7 +86,7 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="AI Engineering Daily 首页">
           AI Engineering Daily
         </a>
-        <Link className="today-link" href="/today" aria-label="查看今日精选">
+        <Link className="header-action" href="/today" aria-label="查看今日精选">
           今日
         </Link>
       </header>

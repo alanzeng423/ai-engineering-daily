@@ -62,6 +62,7 @@ test("renders only the latest issue and its daily summary at /today", async () =
 
   const html = await response.text();
   assert.match(html, /<title>今日精选 — AI Engineering Daily/);
+  assert.match(html, /href="\/"[^>]*>首页<\/a>/);
   assert.match(html, /当日总结/);
   assert.match(html, new RegExp(escapeRegExp(latestDigest.overview)));
   assert.match(html, new RegExp(escapeRegExp(latestDigest.items[0].title)));

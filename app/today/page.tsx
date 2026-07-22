@@ -45,6 +45,9 @@ export default function Today() {
         <Link className="brand" href="/" aria-label="返回 AI Engineering Daily 全部内容">
           AI Engineering Daily
         </Link>
+        <Link className="header-action" href="/" aria-label="返回首页">
+          首页
+        </Link>
       </header>
 
       <section className="digest today-digest">
