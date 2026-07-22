@@ -5,6 +5,8 @@ AI agents, coding agents, software engineering, and AI4SE.
 
 Production: <https://ai.alanzeng.com>
 
+Latest issue: <https://ai.alanzeng.com/today>
+
 Fallback: <https://ai-engineering-daily.alanzeng423.workers.dev>
 
 The site is designed for a daily publishing workflow: a scheduled task gathers
@@ -39,6 +41,8 @@ The catalog deterministically combines a curated historical foundation in
 `content/baseline.json` with every issue stored in
 `content/digests/YYYY-MM-DD.json`. `content/latest.json` remains the exact
 latest issue, while `content/index.json` tracks all available digest dates.
+The `/today` route renders only `content/latest.json` and includes that issue's
+editorial overview as a compact daily summary.
 
 The broad editorial areas overlap and define discovery scope rather than a
 fixed taxonomy. Each story uses a concise, content-specific primary topic and

@@ -5,18 +5,21 @@ import test from "node:test";
 const catalog = JSON.parse(
   await readFile(new URL("../content/catalog.json", import.meta.url), "utf8"),
 );
+const latestDigest = JSON.parse(
+  await readFile(new URL("../content/latest.json", import.meta.url), "utf8"),
+);
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-async function render() {
+async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", {
+    new Request(new URL(path, "http://localhost/"), {
       headers: { accept: "text/html" },
     }),
     {
@@ -48,4 +51,17 @@ test("renders the cumulative content catalog", async () => {
   assert.doesNotMatch(html, /首期内容准备中|第 001 期|每天 09:30 更新|日报|关于/);
 
   assert.doesNotMatch(html, /从代码补全到长期运行|codex-preview|示例数据|趋势观察/);
+});
+
+test("renders only the latest issue and its daily summary at /today", async () => {
+  const response = await render("/today");
+  assert.equal(response.status, 200);
+
+  const html = await response.text();
+  assert.match(html, /<title>今日精选 — AI Engineering Daily/);
+  assert.match(html, /当日总结/);
+  assert.match(html, new RegExp(escapeRegExp(latestDigest.overview)));
+  assert.match(html, new RegExp(escapeRegExp(latestDigest.items[0].title)));
+  assert.equal((html.match(/<article\b/g) ?? []).length, latestDigest.items.length);
+  assert.doesNotMatch(html, /搜索标题、来源或标签|标签筛选/);
 });

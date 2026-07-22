@@ -74,7 +74,7 @@
 
 【部署验证与运行收尾】
 1. 将 manifest.stage 更新为 deployment。推送后取得新提交 SHA，等待该提交的 GitHub Check“Workers Builds: ai-engineering-daily”完成，并将状态及详情链接写入 checks.json。
-2. Check 成功后访问 https://ai.alanzeng.com，确认 HTTP 200、页面包含本期日期和至少一条本期标题，并且渲染出的 article 数量与 content/catalog.json 的 total 一致；记录验证时间、HTTP 状态和结果。workers.dev 地址只可作为故障诊断备用地址。
+2. Check 成功后访问 https://ai.alanzeng.com，确认 HTTP 200、页面包含本期日期和至少一条本期标题，并且渲染出的 article 数量与 content/catalog.json 的 total 一致。再访问 https://ai.alanzeng.com/today，确认 HTTP 200、页面包含本期 overview 与至少一条本期标题，并且渲染出的 article 数量与 content/latest.json 的 items 数量一致；记录两个页面的验证时间、HTTP 状态和结果。workers.dev 地址只可作为故障诊断备用地址。
 3. Check 失败、合理等待后仍未完成或正式域名不匹配时，按失败流程收尾，不得声称已上线。
 4. 全部成功后更新 manifest：status=completed、stage=completed、finishedAt、最终 counts，追加完成事件，然后运行 `npm run research:validate -- RUN_DIRECTORY --complete`。若完整性校验失败，改记 failed 并报告，不得隐瞒缺失的中间产物。
 
