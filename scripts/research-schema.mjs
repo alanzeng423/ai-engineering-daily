@@ -2,6 +2,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import { validateDigest } from "./digest-schema.mjs";
+import { validateBaseline } from "./catalog-schema.mjs";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ISO_STATUSES = new Set(["running", "failed", "completed"]);
@@ -226,11 +227,14 @@ export function validateResearchArtifacts(artifacts, options = {}) {
   }
 
   if (!isObject(digest)) {
-    if (complete) errors.push("digest.json 必须保存最终日报对象");
+    if (complete) errors.push("digest.json 必须保存最终发布对象");
   } else {
-    const digestErrors = validateDigest(digest);
+    const isHistoricalBackfill = manifest.runType === "historical-backfill";
+    const digestErrors = isHistoricalBackfill ? validateBaseline(digest) : validateDigest(digest);
     errors.push(...digestErrors.map((error) => `digest.json: ${error}`));
-    if (digest.date !== targetDate) errors.push("digest.json 的 date 与 targetDate 不一致");
+    if (!isHistoricalBackfill && digest.date !== targetDate) {
+      errors.push("digest.json 的 date 与 targetDate 不一致");
+    }
     if (digest.items?.length !== selectedIds.length) {
       errors.push("digest.json 条目数必须与 selection.selectedIds 一致");
     }
@@ -247,7 +251,11 @@ export function validateResearchArtifacts(artifacts, options = {}) {
   if (!Array.isArray(checks?.commands)) errors.push("checks.commands 必须是数组");
   if (complete) {
     const successfulCommands = (checks.commands ?? []).filter((item) => item.exitCode === 0);
-    for (const required of ["digest:validate", "digest:publish", "npm test"]) {
+    const requiredCommands =
+      manifest.runType === "historical-backfill"
+        ? ["catalog:build", "npm test"]
+        : ["digest:validate", "digest:publish", "npm test"];
+    for (const required of requiredCommands) {
       if (!successfulCommands.some((item) => item.command?.includes(required))) {
         errors.push(`checks.commands 缺少成功记录: ${required}`);
       }

@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { LuSearch } from "react-icons/lu";
-import latestDigest from "@/content/latest.json";
+import catalog from "@/content/catalog.json";
 import { SourceMark } from "./source-mark";
 
 type Story = {
   category: string;
   sourceType: string;
   source: string;
+  publishedAt: string;
+  datePrecision?: "day" | "month" | "year";
   readTime: string;
   title: string;
   summary: string;
@@ -17,7 +19,7 @@ type Story = {
   url: string;
 };
 
-const stories = latestDigest.items as Story[];
+const stories = catalog.items as Story[];
 
 function getFeaturedTags(items: Story[], limit = 8) {
   const stats = new Map<string, { count: number; order: number }>();
@@ -39,16 +41,16 @@ function getFeaturedTags(items: Story[], limit = 8) {
 
 const featuredTags = getFeaturedTags(stories);
 
-function formatDigestDate(date: string | null) {
-  if (!date) return null;
+function formatStoryDate(date: string, precision: Story["datePrecision"] = "day") {
   const [year, month, day] = date.split("-").map(Number);
-  return `${year} 年 ${month} 月 ${day} 日`;
+  if (precision === "year") return String(year);
+  if (precision === "month") return `${year}.${String(month).padStart(2, "0")}`;
+  return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`;
 }
 
 export default function Home() {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const digestDate = formatDigestDate(latestDigest.date);
   const visibleTags =
     activeTag && !featuredTags.includes(activeTag)
       ? [activeTag, ...featuredTags.slice(0, -1)]
@@ -59,7 +61,15 @@ export default function Home() {
     const tagMatch = !activeTag || story.tags.includes(activeTag);
     const queryMatch =
       !normalized ||
-      [story.category, story.sourceType, story.title, story.summary, story.source, ...story.tags]
+      [
+        story.category,
+        story.sourceType,
+        story.title,
+        story.summary,
+        story.source,
+        story.publishedAt,
+        ...story.tags,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(normalized);
@@ -75,22 +85,7 @@ export default function Home() {
         </a>
       </header>
 
-      <section className="digest" id="digest">
-        <div className="digest-intro" id="top">
-          <div className="issue-block">
-            <strong>
-              {latestDigest.issue > 0
-                ? `第 ${String(latestDigest.issue).padStart(3, "0")} 期`
-                : "首期准备中"}
-            </strong>
-            <span>
-              {latestDigest.issue > 0 && digestDate
-                ? `${digestDate} · ${stories.length} 篇`
-                : "内容准备中"}
-            </span>
-          </div>
-          <p>{latestDigest.overview}</p>
-        </div>
+      <section className="digest" id="top">
         <div className="toolbar">
           <div className="tag-filters" aria-label="标签筛选">
             <button
@@ -119,7 +114,7 @@ export default function Home() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="搜索标题、来源或标签"
-              aria-label="搜索日报"
+              aria-label="搜索内容"
             />
           </label>
         </div>
@@ -133,6 +128,9 @@ export default function Home() {
                   <SourceMark type={story.sourceType} />
                   <span className="meta-item story-topic">{story.category}</span>
                   <span className="meta-item">{story.source}</span>
+                  <time className="meta-item" dateTime={story.publishedAt}>
+                    {formatStoryDate(story.publishedAt, story.datePrecision)}
+                  </time>
                   <span className="meta-item">{story.readTime}</span>
                   <div className="story-tags" aria-label="内容标签">
                     {story.tags.map((tag) => (
@@ -160,17 +158,12 @@ export default function Home() {
           ))}
           {filteredStories.length === 0 && (
             <div className="empty-state">
-              <span>{stories.length === 0 ? "首期内容准备中" : "暂无匹配内容"}</span>
-              {stories.length > 0 && <p>请尝试其他关键词或主题。</p>}
+              <span>暂无匹配内容</span>
+              <p>请尝试其他关键词或主题。</p>
             </div>
           )}
         </div>
       </section>
-
-      <footer id="about">
-        <div className="brand footer-brand">AI Engineering Daily</div>
-        <p className="footer-note">AI research and engineering</p>
-      </footer>
     </main>
   );
 }

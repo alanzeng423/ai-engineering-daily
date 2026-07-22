@@ -34,9 +34,11 @@ npm test
 
 ## Content workflow
 
-The website renders only validated data from `content/latest.json`. Each issue
-is also stored in `content/digests/YYYY-MM-DD.json`, while
-`content/index.json` tracks the available dates.
+The website renders a cumulative, validated catalog from `content/catalog.json`.
+The catalog deterministically combines a curated historical foundation in
+`content/baseline.json` with every issue stored in
+`content/digests/YYYY-MM-DD.json`. `content/latest.json` remains the exact
+latest issue, while `content/index.json` tracks all available digest dates.
 
 The broad editorial areas overlap and define discovery scope rather than a
 fixed taxonomy. Each story uses a concise, content-specific primary topic and
@@ -49,10 +51,13 @@ To validate and publish a generated draft:
 ```bash
 npm run digest:validate -- content/inbox/YYYY-MM-DD.json
 npm run digest:publish -- content/inbox/YYYY-MM-DD.json
+npm run catalog:build
 npm test
 ```
 
-The daily automation follows this workflow, commits only the published content
+The publish command rebuilds `content/catalog.json` automatically. The daily
+automation follows this workflow, checks new candidates against both the
+historical baseline and recent issues, commits only the published content
 files, and pushes `main`. Cloudflare Workers Builds then deploys that commit.
 Its versioned prompt is stored in `automation/daily-digest-prompt.md`.
 

@@ -17,13 +17,15 @@ export const DIGEST_SOURCE_TYPES = [
   "website",
 ];
 
+export const CONTENT_DATE_PRECISIONS = ["day", "month", "year"];
+
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function isPlainObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function isCalendarDate(value) {
+export function isCalendarDate(value) {
   if (typeof value !== "string" || !DATE_PATTERN.test(value)) return false;
   const [year, month, day] = value.split("-").map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
@@ -42,12 +44,52 @@ function hasText(value, min, max) {
   );
 }
 
-function isHttpsUrl(value) {
+export function isHttpsUrl(value) {
   try {
     return new URL(value).protocol === "https:";
   } catch {
     return false;
   }
+}
+
+export function validateStory(item, options = {}) {
+  const { path = "item", expectedDate = null } = options;
+  const errors = [];
+
+  if (!isPlainObject(item)) return [`${path} 必须是一个对象`];
+  if (!hasText(item.category, 2, 40)) {
+    errors.push(`${path}.category 必须是 2–40 个字符的主题标签`);
+  }
+  if (!DIGEST_SOURCE_TYPES.includes(item.sourceType)) {
+    errors.push(`${path}.sourceType 必须是受支持的来源平台`);
+  }
+  if (!hasText(item.source, 2, 120)) errors.push(`${path}.source 长度不合法`);
+  if (!hasText(item.readTime, 1, 30)) errors.push(`${path}.readTime 长度不合法`);
+  if (!hasText(item.title, 8, 180)) errors.push(`${path}.title 长度不合法`);
+  if (!hasText(item.summary, 30, 600)) errors.push(`${path}.summary 长度不合法`);
+  if (!hasText(item.why, 15, 360)) errors.push(`${path}.why 长度不合法`);
+  if (!isHttpsUrl(item.url)) errors.push(`${path}.url 必须是 HTTPS 链接`);
+  if (!isCalendarDate(item.publishedAt)) {
+    errors.push(`${path}.publishedAt 必须是有效的 YYYY-MM-DD 日期`);
+  } else if (expectedDate && item.publishedAt !== expectedDate) {
+    errors.push(`${path}.publishedAt 必须与日报 date 一致`);
+  }
+  if (
+    item.datePrecision !== undefined &&
+    !CONTENT_DATE_PRECISIONS.includes(item.datePrecision)
+  ) {
+    errors.push(`${path}.datePrecision 必须是 day、month 或 year`);
+  }
+  if (
+    !Array.isArray(item.tags) ||
+    item.tags.length < 1 ||
+    item.tags.length > 6 ||
+    item.tags.some((tag) => !hasText(tag, 1, 40))
+  ) {
+    errors.push(`${path}.tags 必须包含 1–6 个短标签`);
+  }
+
+  return errors;
 }
 
 export function validateDigest(digest) {
@@ -81,35 +123,9 @@ export function validateDigest(digest) {
 
   digest.items.forEach((item, index) => {
     const path = `items[${index}]`;
-    if (!isPlainObject(item)) {
-      errors.push(`${path} 必须是一个对象`);
-      return;
-    }
-    if (!hasText(item.category, 2, 40)) {
-      errors.push(`${path}.category 必须是 2–40 个字符的主题标签`);
-    }
-    if (!DIGEST_SOURCE_TYPES.includes(item.sourceType)) {
-      errors.push(`${path}.sourceType 必须是受支持的来源平台`);
-    }
-    if (!hasText(item.source, 2, 120)) errors.push(`${path}.source 长度不合法`);
-    if (!hasText(item.readTime, 1, 30)) errors.push(`${path}.readTime 长度不合法`);
-    if (!hasText(item.title, 8, 180)) errors.push(`${path}.title 长度不合法`);
-    if (!hasText(item.summary, 30, 600)) errors.push(`${path}.summary 长度不合法`);
-    if (!hasText(item.why, 15, 360)) errors.push(`${path}.why 长度不合法`);
-    if (!isHttpsUrl(item.url)) errors.push(`${path}.url 必须是 HTTPS 链接`);
-    if (!isCalendarDate(item.publishedAt)) {
-      errors.push(`${path}.publishedAt 必须是有效的 YYYY-MM-DD 日期`);
-    } else if (item.publishedAt !== digest.date) {
-      errors.push(`${path}.publishedAt 必须与日报 date 一致`);
-    }
-    if (
-      !Array.isArray(item.tags) ||
-      item.tags.length < 1 ||
-      item.tags.length > 6 ||
-      item.tags.some((tag) => !hasText(tag, 1, 40))
-    ) {
-      errors.push(`${path}.tags 必须包含 1–6 个短标签`);
-    }
+    errors.push(...validateStory(item, { path, expectedDate: digest.date }));
+
+    if (!isPlainObject(item)) return;
 
     if (typeof item.url === "string") {
       const normalizedUrl = item.url.trim().replace(/\/$/, "");

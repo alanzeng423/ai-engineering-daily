@@ -22,7 +22,7 @@
 11. 任一步失败，都必须保留已有 retrieval 和阶段文件，更新 manifest 为 failed、finishedAt 和结构化 failure，并追加失败事件；禁止为了下次重跑而清理本次目录。
 
 【历史去重】
-1. 读取 content/index.json、content/latest.json、scripts/digest-schema.mjs，以及最近 14 天已归档的 content/digests/*.json；建立既有 URL、标题、主题和事件清单。
+1. 读取 content/index.json、content/latest.json、content/baseline.json、content/catalog.json、scripts/digest-schema.mjs，以及最近 14 天已归档的 content/digests/*.json；建立既有 URL、标题、主题和事件清单。基底库用于全历史去重，最近 14 天归档用于事件级强去重。
 2. 同一论文、产品发布、项目版本或事件在近 14 天内原则上只收录一次。只有出现实质性新增结果、版本或工程细节时才可再次收录，并在摘要中明确新增内容。
 
 【阶段一：候选收集】
@@ -67,14 +67,14 @@
 
 【Git 发布】
 1. 将 manifest.stage 更新为 publishing，运行 `git status --porcelain` 并记录结果。
-2. 只允许 content/index.json、content/latest.json、content/digests/YYYY-MM-DD.json 三个文件发生变化；research/ 与 content/inbox/ 必须保持 Git 忽略。发现其他变化时记录失败并停止，不得暂存或覆盖。
-3. 仅暂存上述三个文件。若与仓库现有版本完全相同，不创建空提交；在 checks.json 记录“本期无变化”，继续核对正式站点已有内容。
+2. 只允许 content/index.json、content/latest.json、content/catalog.json、content/digests/YYYY-MM-DD.json 四个文件发生变化；research/ 与 content/inbox/ 必须保持 Git 忽略。content/catalog.json 由发布脚本从基底库和所有日报归档确定性生成，不得手工编辑。发现其他变化时记录失败并停止，不得暂存或覆盖。
+3. 仅暂存上述四个文件。若与仓库现有版本完全相同，不创建空提交；在 checks.json 记录“本期无变化”，继续核对正式站点已有内容。
 4. 提交信息固定为：Publish daily digest YYYY-MM-DD。
 5. 推送到 origin main；失败时停止并记录，不 force push，不改写历史。将 commitSha、remote、branch 和 pushed 写入 checks.json。
 
 【部署验证与运行收尾】
 1. 将 manifest.stage 更新为 deployment。推送后取得新提交 SHA，等待该提交的 GitHub Check“Workers Builds: ai-engineering-daily”完成，并将状态及详情链接写入 checks.json。
-2. Check 成功后访问 https://ai.alanzeng.com，确认 HTTP 200，并且页面包含本期日期、条目数和至少一条本期标题；记录验证时间、HTTP 状态和结果。workers.dev 地址只可作为故障诊断备用地址。
+2. Check 成功后访问 https://ai.alanzeng.com，确认 HTTP 200、页面包含本期日期和至少一条本期标题，并且渲染出的 article 数量与 content/catalog.json 的 total 一致；记录验证时间、HTTP 状态和结果。workers.dev 地址只可作为故障诊断备用地址。
 3. Check 失败、合理等待后仍未完成或正式域名不匹配时，按失败流程收尾，不得声称已上线。
 4. 全部成功后更新 manifest：status=completed、stage=completed、finishedAt、最终 counts，追加完成事件，然后运行 `npm run research:validate -- RUN_DIRECTORY --complete`。若完整性校验失败，改记 failed 并报告，不得隐瞒缺失的中间产物。
 

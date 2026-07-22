@@ -15,6 +15,7 @@
     "digest:check": "node scripts/check-content.mjs",
     "digest:validate": "node scripts/validate-digest.mjs",
     "digest:publish": "node scripts/publish-digest.mjs",
+    "catalog:build": "node scripts/rebuild-catalog.mjs",
     "research:init": "node scripts/init-research-run.mjs",
     "research:validate": "node scripts/validate-research-run.mjs"
   },

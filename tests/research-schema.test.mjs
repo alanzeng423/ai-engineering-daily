@@ -146,3 +146,29 @@ test("rejects a candidate that references a missing retrieval batch", () => {
   const errors = validateResearchArtifacts(run, { complete: true });
   assert.ok(errors.some((error) => error.includes("不存在的 retrievalId")));
 });
+
+test("accepts a complete historical backfill with a baseline collection", () => {
+  const run = completeRun();
+  const item = run.digest.items[0];
+  run.manifest.runType = "historical-backfill";
+  run.digest = {
+    schemaVersion: 1,
+    id: "foundation-test",
+    title: "AI 工程基础精选",
+    generatedAt: "2026-07-22T01:45:00Z",
+    coverage: {
+      from: item.publishedAt,
+      to: item.publishedAt,
+      primaryFrom: "2026-01-22",
+      primaryTo: "2026-07-21",
+      exceptionalOlder: 0,
+    },
+    overview: "本次回溯整理可复核的一手工程文章和实证研究，为后续每日新增内容建立稳定的历史基底。",
+    items: [item],
+  };
+  run.checks.commands = [
+    { command: "npm run catalog:build", exitCode: 0 },
+    { command: "npm test", exitCode: 0 },
+  ];
+  assert.deepEqual(validateResearchArtifacts(run, { complete: true }), []);
+});

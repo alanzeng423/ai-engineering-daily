@@ -2,6 +2,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readAndValidateDigest, stableJson } from "./digest-schema.mjs";
+import { rebuildCatalog } from "./rebuild-catalog.mjs";
 
 const input = process.argv[2];
 if (!input) {
@@ -44,8 +45,11 @@ try {
     dates,
   });
 
+  const catalog = await rebuildCatalog();
+
   console.log(`已发布 ${digest.date}：${archivePath}`);
   console.log(`当前最新一期：${latestDate}`);
+  console.log(`累计内容：${catalog.total} 篇`);
 } catch (error) {
   console.error(error.message);
   process.exit(1);

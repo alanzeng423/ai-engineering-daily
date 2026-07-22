@@ -3,11 +3,14 @@ import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateDigest } from "./digest-schema.mjs";
+import { buildCatalog, validateBaseline, validateCatalog } from "./catalog-schema.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const contentDirectory = resolve(root, "content");
 const index = JSON.parse(await readFile(resolve(contentDirectory, "index.json"), "utf8"));
 const latest = JSON.parse(await readFile(resolve(contentDirectory, "latest.json"), "utf8"));
+const baseline = JSON.parse(await readFile(resolve(contentDirectory, "baseline.json"), "utf8"));
+const catalog = JSON.parse(await readFile(resolve(contentDirectory, "catalog.json"), "utf8"));
 
 assert.equal(index.schemaVersion, 1, "content/index.json schemaVersion 必须为 1");
 assert.ok(Array.isArray(index.dates), "content/index.json dates 必须是数组");
@@ -34,4 +37,17 @@ if (index.latest === null) {
   assert.deepEqual(latest, archivedLatest, "latest.json 必须与最新归档完全一致");
 }
 
-console.log(`内容索引校验通过：${index.dates.length} 期`);
+const baselineErrors = validateBaseline(baseline);
+assert.deepEqual(baselineErrors, [], `baseline.json 校验失败：\n${baselineErrors.join("\n")}`);
+const catalogErrors = validateCatalog(catalog);
+assert.deepEqual(catalogErrors, [], `catalog.json 校验失败：\n${catalogErrors.join("\n")}`);
+
+const digests = [];
+for (const date of [...index.dates].sort()) {
+  digests.push(
+    JSON.parse(await readFile(resolve(contentDirectory, "digests", `${date}.json`), "utf8")),
+  );
+}
+assert.deepEqual(catalog, buildCatalog(baseline, digests), "catalog.json 必须是基底库与日报归档的确定性合并结果");
+
+console.log(`内容索引校验通过：${index.dates.length} 期，累计 ${catalog.total} 篇`);
