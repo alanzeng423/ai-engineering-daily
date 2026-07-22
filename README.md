@@ -7,6 +7,8 @@ Production: <https://ai.alanzeng.com>
 
 Latest issue: <https://ai.alanzeng.com/today>
 
+Papers only: <https://ai.alanzeng.com/paper>
+
 Fallback: <https://ai-engineering-daily.alanzeng423.workers.dev>
 
 The site is designed for a daily publishing workflow: a scheduled task gathers

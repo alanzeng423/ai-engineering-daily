@@ -34,6 +34,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
   border-bottom: 1px solid var(--line);
 }
 .brand { font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+.header-actions { display: flex; align-items: center; gap: 6px; }
 .header-action {
   display: inline-flex;
   height: 28px;

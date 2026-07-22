@@ -8,6 +8,8 @@ const catalog = JSON.parse(
 const latestDigest = JSON.parse(
   await readFile(new URL("../content/latest.json", import.meta.url), "utf8"),
 );
+const paperSourceTypes = new Set(["arxiv", "openreview", "paper"]);
+const paperStories = catalog.items.filter((item) => paperSourceTypes.has(item.sourceType));
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -41,6 +43,7 @@ test("renders the cumulative content catalog", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>AI Engineering Daily/);
+  assert.match(html, /href="\/paper"[^>]*>论文<\/a>/);
   assert.match(html, /href="\/today"[^>]*>今日<\/a>/);
   assert.match(html, /搜索标题、来源或标签/);
   assert.match(html, new RegExp(escapeRegExp(catalog.items[0].title)));
@@ -72,4 +75,25 @@ test("renders only the latest issue and its daily summary at /today", async () =
   assert.match(html, new RegExp(escapeRegExp(arxivPaper.subtitle)));
   assert.equal((html.match(/<article\b/g) ?? []).length, latestDigest.items.length);
   assert.doesNotMatch(html, /搜索标题、来源或标签|标签筛选/);
+});
+
+test("renders only papers and preprints at /paper", async () => {
+  const response = await render("/paper");
+  assert.equal(response.status, 200);
+
+  const html = await response.text();
+  assert.match(html, /<title>论文精选 — AI Engineering Daily/);
+  assert.match(html, /href="\/"[^>]*>首页<\/a>/);
+  assert.match(html, /搜索标题、来源或标签/);
+  assert.match(html, new RegExp(escapeRegExp(paperStories[0].title)));
+  assert.equal((html.match(/<article\b/g) ?? []).length, paperStories.length);
+
+  const renderedSourceTypes = [...html.matchAll(/data-source-type="([^"]+)"/g)]
+    .map((match) => match[1]);
+  assert.equal(renderedSourceTypes.length, paperStories.length);
+  assert.ok(renderedSourceTypes.every((sourceType) => paperSourceTypes.has(sourceType)));
+
+  const nonPaper = catalog.items.find((item) => !paperSourceTypes.has(item.sourceType));
+  assert.ok(nonPaper);
+  assert.doesNotMatch(html, new RegExp(escapeRegExp(nonPaper.title)));
 });
