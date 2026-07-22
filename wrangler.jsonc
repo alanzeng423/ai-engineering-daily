@@ -4,6 +4,12 @@
   "main": "./worker/index.ts",
   "compatibility_date": "2026-07-22",
   "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    {
+      "pattern": "ai.alanzeng.com",
+      "custom_domain": true
+    }
+  ],
   "observability": {
     "enabled": true
   }

@@ -7,11 +7,16 @@ const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 const noto = Noto_Sans_SC({ variable: "--font-noto-sc", subsets: ["latin"], weight: ["400", "500", "600", "700", "900"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ai.alanzeng.com"),
   title: "AI Engineering Daily — 每日 AI 与软件工程精选",
   description: "每天精选 LLM、Agent、Coding Agent、软件工程与 AI4SE 的高质量内容。",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "AI Engineering Daily",
     description: "每日 AI 与软件工程精选",
+    url: "/",
   },
   twitter: { card: "summary" },
 };

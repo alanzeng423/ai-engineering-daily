@@ -3,7 +3,9 @@
 A compact daily digest for high-quality writing and discussions about LLMs,
 AI agents, coding agents, software engineering, and AI4SE.
 
-Production: <https://ai-engineering-daily.alanzeng423.workers.dev>
+Production: <https://ai.alanzeng.com>
+
+Fallback: <https://ai-engineering-daily.alanzeng423.workers.dev>
 
 The site is designed for a daily publishing workflow: a scheduled task gathers
 and verifies the previous day's sources, produces structured digest data, and
