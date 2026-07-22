@@ -14,6 +14,9 @@ export default function Home() {
           AI Engineering Daily
         </a>
         <nav className="header-actions" aria-label="内容入口">
+          <Link className="header-action" href="/x" aria-label="查看 X 推文">
+            X
+          </Link>
           <Link className="header-action" href="/paper" aria-label="查看论文">
             论文
           </Link>

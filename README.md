@@ -9,6 +9,8 @@ Latest issue: <https://ai.alanzeng.com/today>
 
 Papers only: <https://ai.alanzeng.com/paper>
 
+X posts only: <https://ai.alanzeng.com/x>
+
 Fallback: <https://ai-engineering-daily.alanzeng423.workers.dev>
 
 The site is designed for a daily publishing workflow: a scheduled task gathers

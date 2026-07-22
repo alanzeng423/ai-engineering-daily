@@ -10,6 +10,7 @@ const latestDigest = JSON.parse(
 );
 const paperSourceTypes = new Set(["arxiv", "openreview", "paper"]);
 const paperStories = catalog.items.filter((item) => paperSourceTypes.has(item.sourceType));
+const xStories = catalog.items.filter((item) => item.sourceType === "x");
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -43,6 +44,7 @@ test("renders the cumulative content catalog", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>AI Engineering Daily/);
+  assert.match(html, /href="\/x"[^>]*>X<\/a>/);
   assert.match(html, /href="\/paper"[^>]*>论文<\/a>/);
   assert.match(html, /href="\/today"[^>]*>今日<\/a>/);
   assert.match(html, /搜索标题、来源或标签/);
@@ -96,4 +98,29 @@ test("renders only papers and preprints at /paper", async () => {
   const nonPaper = catalog.items.find((item) => !paperSourceTypes.has(item.sourceType));
   assert.ok(nonPaper);
   assert.doesNotMatch(html, new RegExp(escapeRegExp(nonPaper.title)));
+});
+
+test("renders only original X posts at /x", async () => {
+  const response = await render("/x");
+  assert.equal(response.status, 200);
+
+  const html = await response.text();
+  assert.match(html, /<title>X 推文精选 — AI Engineering Daily/);
+  assert.match(html, /href="\/"[^>]*>首页<\/a>/);
+  assert.equal((html.match(/<article\b/g) ?? []).length, xStories.length);
+
+  const renderedSourceTypes = [...html.matchAll(/data-source-type="([^"]+)"/g)]
+    .map((match) => match[1]);
+  assert.equal(renderedSourceTypes.length, xStories.length);
+  assert.ok(renderedSourceTypes.every((sourceType) => sourceType === "x"));
+
+  if (xStories.length > 0) {
+    assert.match(html, new RegExp(escapeRegExp(xStories[0].title)));
+  } else {
+    assert.match(html, /暂无收录推文/);
+  }
+
+  const nonXPost = catalog.items.find((item) => item.sourceType !== "x");
+  assert.ok(nonXPost);
+  assert.doesNotMatch(html, new RegExp(escapeRegExp(nonXPost.title)));
 });

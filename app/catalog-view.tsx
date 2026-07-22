@@ -45,7 +45,15 @@ function formatStoryDate(date: string, precision: Story["datePrecision"] = "day"
   return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`;
 }
 
-export function CatalogView({ stories }: { stories: Story[] }) {
+export function CatalogView({
+  stories,
+  emptyTitle = "暂无匹配内容",
+  emptyDescription = "请尝试其他关键词或主题。",
+}: {
+  stories: Story[];
+  emptyTitle?: string;
+  emptyDescription?: string;
+}) {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const featuredTags = useMemo(() => getFeaturedTags(stories), [stories]);
@@ -154,8 +162,8 @@ export function CatalogView({ stories }: { stories: Story[] }) {
         ))}
         {filteredStories.length === 0 && (
           <div className="empty-state">
-            <span>暂无匹配内容</span>
-            <p>请尝试其他关键词或主题。</p>
+            <span>{emptyTitle}</span>
+            <p>{emptyDescription}</p>
           </div>
         )}
       </div>
