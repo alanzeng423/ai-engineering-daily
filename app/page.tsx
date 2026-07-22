@@ -13,6 +13,7 @@ type Story = {
   datePrecision?: "day" | "month" | "year";
   readTime: string;
   title: string;
+  subtitle?: string;
   summary: string;
   why: string;
   tags: string[];
@@ -65,6 +66,7 @@ export default function Home() {
         story.category,
         story.sourceType,
         story.title,
+        story.subtitle ?? "",
         story.summary,
         story.source,
         story.publishedAt,
@@ -125,9 +127,15 @@ export default function Home() {
               <div className="story-rank">{String(index + 1).padStart(2, "0")}</div>
               <div className="story-body">
                 <div className="story-meta">
-                  <SourceMark type={story.sourceType} />
+                  <span className="story-source">
+                    <SourceMark
+                      type={story.sourceType}
+                      url={story.url}
+                      source={story.source}
+                    />
+                    <span>{story.source}</span>
+                  </span>
                   <span className="meta-item story-topic">{story.category}</span>
-                  <span className="meta-item">{story.source}</span>
                   <time className="meta-item" dateTime={story.publishedAt}>
                     {formatStoryDate(story.publishedAt, story.datePrecision)}
                   </time>
@@ -146,9 +154,10 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <h2>
+                <h2 className={story.subtitle ? "has-subtitle" : undefined}>
                   <a href={story.url} target="_blank" rel="noreferrer">{story.title}</a>
                 </h2>
+                {story.subtitle && <p className="story-subtitle">{story.subtitle}</p>}
                 <div className="story-copy">
                   <p className="summary">{story.summary}</p>
                   <p className="why"><b>关注点</b>{story.why}</p>

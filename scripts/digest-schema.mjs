@@ -66,6 +66,11 @@ export function validateStory(item, options = {}) {
   if (!hasText(item.source, 2, 120)) errors.push(`${path}.source 长度不合法`);
   if (!hasText(item.readTime, 1, 30)) errors.push(`${path}.readTime 长度不合法`);
   if (!hasText(item.title, 8, 180)) errors.push(`${path}.title 长度不合法`);
+  if (item.sourceType === "arxiv" && !hasText(item.subtitle, 4, 180)) {
+    errors.push(`${path}.subtitle 是 arXiv 论文必填的中文副标题，长度须为 4–180 个字符`);
+  } else if (item.subtitle !== undefined && !hasText(item.subtitle, 4, 180)) {
+    errors.push(`${path}.subtitle 长度不合法`);
+  }
   if (!hasText(item.summary, 30, 600)) errors.push(`${path}.summary 长度不合法`);
   if (!hasText(item.why, 15, 360)) errors.push(`${path}.why 长度不合法`);
   if (!isHttpsUrl(item.url)) errors.push(`${path}.url 必须是 HTTPS 链接`);

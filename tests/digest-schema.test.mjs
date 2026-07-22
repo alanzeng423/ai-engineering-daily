@@ -17,7 +17,8 @@ function createDigest(category = "Agent 可靠性") {
         source: "Example Engineering",
         publishedAt: "2026-07-21",
         readTime: "8 min",
-        title: "用执行轨迹改进长任务中的故障恢复能力",
+        title: "Example Paper: Improving Failure Recovery with Execution Traces",
+        subtitle: "用执行轨迹改进长任务中的故障恢复能力",
         summary: "文章分析长任务中故障暴露位置与真正根因不一致的问题，并通过结构化轨迹回放定位关键步骤。实验给出了恢复成功率和额外运行成本，说明该方法适合生产环境的回归验证。",
         why: "它为生产 Agent 的故障诊断、自动恢复与回归测试提供了可复用的工程方法。",
         url: "https://example.com/agent-reliability",
@@ -40,4 +41,10 @@ test("rejects an unsupported source platform", () => {
   const digest = createDigest();
   digest.items[0].sourceType = "search-result";
   assert.match(validateDigest(digest)[0], /sourceType/);
+});
+
+test("requires a Chinese editorial subtitle for arXiv papers", () => {
+  const digest = createDigest();
+  delete digest.items[0].subtitle;
+  assert.match(validateDigest(digest).join("\n"), /arXiv.*subtitle|subtitle.*arXiv/);
 });

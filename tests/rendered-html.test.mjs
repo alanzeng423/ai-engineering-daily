@@ -47,6 +47,8 @@ test("renders the cumulative content catalog", async () => {
     html,
     new RegExp(`data-source-type="${escapeRegExp(catalog.items[0].sourceType)}"`),
   );
+  assert.match(html, /data-source-brand="openai"/);
+  assert.match(html, /data-source-brand="harness\.io"/);
   assert.match(html, /aria-label="标签筛选"/);
   assert.doesNotMatch(html, /首期内容准备中|第 001 期|每天 09:30 更新|日报|关于/);
 
@@ -62,6 +64,10 @@ test("renders only the latest issue and its daily summary at /today", async () =
   assert.match(html, /当日总结/);
   assert.match(html, new RegExp(escapeRegExp(latestDigest.overview)));
   assert.match(html, new RegExp(escapeRegExp(latestDigest.items[0].title)));
+  const arxivPaper = latestDigest.items.find((item) => item.sourceType === "arxiv");
+  assert.ok(arxivPaper?.subtitle);
+  assert.match(html, new RegExp(escapeRegExp(arxivPaper.title)));
+  assert.match(html, new RegExp(escapeRegExp(arxivPaper.subtitle)));
   assert.equal((html.match(/<article\b/g) ?? []).length, latestDigest.items.length);
   assert.doesNotMatch(html, /搜索标题、来源或标签|标签筛选/);
 });

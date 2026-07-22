@@ -47,8 +47,10 @@ editorial overview as a compact daily summary.
 The broad editorial areas overlap and define discovery scope rather than a
 fixed taxonomy. Each story uses a concise, content-specific primary topic and
 flexible cross-cutting tags. It also records a normalized `sourceType` so the
-site can display a recognizable platform icon for papers, posts, repositories,
-newsletters, and blogs.
+site can display a recognizable platform or original-site icon for papers,
+posts, repositories, newsletters, and blogs. arXiv entries preserve the paper's
+verified original title and place the concise Chinese editorial title in the
+optional `subtitle` field.
 
 To validate and publish a generated draft:
 

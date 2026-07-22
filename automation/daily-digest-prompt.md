@@ -53,9 +53,10 @@
 3. category 是 2–40 个字符的内容特定主主题，可根据原文自由命名，例如“推理系统”“Agent 可靠性”“程序修复”“软件测试”“开发工具”“安全治理”；不要求映射到 LLM、Agent、Coding Agent、AI4SE、SE。
 4. sourceType 根据最终原始链接的平台填写，只能是 arxiv、huggingface、x、reddit、wechat、github、openreview、medium、substack、youtube、newsletter、blog、paper、website 之一；优先使用具体平台，无法归入已知平台时再使用 blog、paper 或 website。
 5. overview 用中文 2–4 句概括共同信号，不使用 Markdown，不单列趋势观察。
-6. 每条必须包含 category、sourceType、source、publishedAt、readTime、title、summary、why、url、tags。title 准确、自然、克制；summary 用中文 2–4 句依次说明问题或发布内容、方法或实现、具体证据或结果；why 用中文 1–2 句说明对工程实践或研究判断的具体价值。
-7. tags 由 AI 持续维护，目标为每条 2–4 个、最多 6 个可交叉标签。先读取最近 14 天归档中的既有标签，优先复用稳定词汇、合并同义词和不同写法；每个标签都应能作为有意义的筛选条件。标签可描述技术、方法、产品、任务或工程场景，避免与 category 重复，也不要为了覆盖检索方向而强行加入 LLM、Agent、Coding Agent、AI4SE 或 SE。
-8. 摘要只能使用已核验的原文证据。避免“值得关注”“意义重大”“标志着新时代”“引发广泛讨论”等空泛措辞，不猜测作者意图，不加入推荐口吻、免责声明、AI 生成说明或 JSON 之外的字段。
+6. 每条必须包含 category、sourceType、source、publishedAt、readTime、title、summary、why、url、tags；subtitle 仅按下一条规则使用。summary 用中文 2–4 句依次说明问题或发布内容、方法或实现、具体证据或结果；why 用中文 1–2 句说明对工程实践或研究判断的具体价值。
+7. 对 sourceType=arxiv 的论文，title 必须逐字保留 arXiv v1 页面核验到的英文原题，不翻译、不改写、不添加编辑措辞；subtitle 必填，用中文写准确、自然、克制的总结性副标题。其他来源的 title 使用准确、自然、克制的中文编辑标题，通常不填写 subtitle。
+8. tags 由 AI 持续维护，目标为每条 2–4 个、最多 6 个可交叉标签。先读取最近 14 天归档中的既有标签，优先复用稳定词汇、合并同义词和不同写法；每个标签都应能作为有意义的筛选条件。标签可描述技术、方法、产品、任务或工程场景，避免与 category 重复，也不要为了覆盖检索方向而强行加入 LLM、Agent、Coding Agent、AI4SE 或 SE。
+9. 摘要只能使用已核验的原文证据。避免“值得关注”“意义重大”“标志着新时代”“引发广泛讨论”等空泛措辞，不猜测作者意图，不加入推荐口吻、免责声明、AI 生成说明或上述字段之外的字段。
 
 【校验与发布】
 将 manifest.stage 更新为 validation，每个命令执行后立即把命令、时间、退出码和输出写入 checks.json：
