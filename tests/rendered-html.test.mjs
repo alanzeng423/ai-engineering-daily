@@ -1,5 +1,14 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
+
+const latestDigest = JSON.parse(
+  await readFile(new URL("../content/latest.json", import.meta.url), "utf8"),
+);
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -31,6 +40,17 @@ test("renders the daily digest", async () => {
   assert.match(html, /<title>AI Engineering Daily/);
   assert.match(html, /今日概览/);
   assert.match(html, /精选内容/);
-  assert.match(html, /首期内容准备中/);
+
+  if (latestDigest.items.length === 0) {
+    assert.match(html, /首期内容准备中/);
+  } else {
+    assert.doesNotMatch(html, /首期内容准备中/);
+    assert.match(html, new RegExp(escapeRegExp(latestDigest.items[0].title)));
+    assert.match(
+      html,
+      new RegExp(`第 ${String(latestDigest.issue).padStart(3, "0")} 期`),
+    );
+  }
+
   assert.doesNotMatch(html, /从代码补全到长期运行|codex-preview|示例数据|趋势观察/);
 });
