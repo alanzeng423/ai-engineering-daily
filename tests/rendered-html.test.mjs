@@ -31,6 +31,6 @@ test("renders the daily digest", async () => {
   assert.match(html, /<title>AI Engineering Daily/);
   assert.match(html, /今日概览/);
   assert.match(html, /精选内容/);
-  assert.match(html, /从代码补全到长期运行/);
-  assert.doesNotMatch(html, /codex-preview|示例数据|趋势观察/);
+  assert.match(html, /首期内容准备中/);
+  assert.doesNotMatch(html, /从代码补全到长期运行|codex-preview|示例数据|趋势观察/);
 });
