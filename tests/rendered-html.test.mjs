@@ -41,6 +41,7 @@ test("renders the cumulative content catalog", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>AI Engineering Daily/);
+  assert.match(html, /href="\/today"[^>]*>今日<\/a>/);
   assert.match(html, /搜索标题、来源或标签/);
   assert.match(html, new RegExp(escapeRegExp(catalog.items[0].title)));
   assert.match(

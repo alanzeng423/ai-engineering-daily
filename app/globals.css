@@ -30,9 +30,22 @@ main { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
   height: 46px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid var(--line);
 }
 .brand { font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+.today-link {
+  display: inline-flex;
+  height: 28px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.today-link:hover { border-color: var(--black); background: var(--soft); }
+.today-link:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
 
 .digest { padding: 0 0 48px; }
 .today-summary {
