@@ -2,9 +2,43 @@
   "schemaVersion": 1,
   "issue": 1,
   "date": "2026-07-21",
-  "generatedAt": "2026-07-22T05:52:48Z",
-  "overview": "当天的核心进展集中在把 AI Agent 从“能生成结果”推进到可维护、可验证、可治理的工程系统。研究工作分别处理代码冗余、上下文裁剪、故障归因、修复搜索、需求追踪、功能测试与数据泄漏，显示可靠性越来越取决于模型外部的执行与验证闭环。与此同时，推理加速、技能生命周期和统一平台治理也在补齐大规模部署所需的基础设施。",
+  "generatedAt": "2026-07-22T07:18:43Z",
+  "overview": "当天最清晰的信号不是模型参数，而是 Agent 进入生产后的验证与运行边界：Anthropic、Datadog、Harness、CNCF 和 Cloudflare 分别把安全审查、规范驱动执行、交付治理、平台上下文与隔离运行落成工程机制。开源发布与独立实践进一步强调，身份、密钥、自动化入口、测试和可复现制品要成为默认控制面。研究侧则聚焦补丁冗余、故障归因、上下文裁剪与高并发推理，表明 Agent 能力的下一阶段取决于模型外部的可维护、可观察与高效执行闭环。",
   "items": [
+    {
+      "category": "开发安全",
+      "sourceType": "blog",
+      "source": "Anthropic、Jason Clinton",
+      "publishedAt": "2026-07-21",
+      "readTime": "5 min",
+      "title": "Anthropic 公开 AI 原生 SDLC 的安全控制闭环",
+      "summary": "Anthropic 称 Claude 目前编写约 80% 的合并代码，工程师季度交付量相较 2021–2025 年平均提高 8 倍，安全团队因此重构计划、编码、CI、部署与监控控制。它把组织知识接入项目安全评审，用 CLAUDE.md 与 Skills 回写已知缺陷模式，在 PR 阶段并行运行职责隔离的 Agent 审查与 SAST，并通过远程虚拟机和出站白名单限制提示注入后的影响范围。要求 Agent 为发现提供证据后，获得实质性审查意见的 PR 占比从 16% 升至 54%；团队估计约三分之一过去的 claude.ai 事故可被现有自动化捕获。",
+      "why": "这给出了高代码产出场景下组合 AI 审查、确定性扫描、人类审批和 SIEM 审计的真实数据，而不只是原则性安全建议。",
+      "url": "https://claude.com/blog/how-anthropic-secures-its-ai-native-software-development-lifecycle",
+      "tags": [
+        "Claude Code",
+        "AI 原生 SDLC",
+        "安全审查",
+        "最小权限"
+      ]
+    },
+    {
+      "category": "可验证执行",
+      "sourceType": "blog",
+      "source": "Datadog、Sesh Nalla",
+      "publishedAt": "2026-07-21",
+      "readTime": "5 min",
+      "title": "Datadog 用规范与确定性内核约束 Claude Code 的长任务",
+      "summary": "Datadog 称全体工程师都使用 AI 编码工具，其中至少三分之二由 Claude Code 驱动；当 Agent 会话延长到数天后，瓶颈从生成转向对工具、胶水代码和生产行为的验证。其 Temper 让 Agent 生成行为、数据与授权三类规范，而不是直接把自由生成代码当作运行产物；确定性内核依次执行符号推理、可达状态穷举、带故障注入的可复现模拟和随机属性测试。团队此前用 Claude Code 构建的 Kafka 可比流处理服务显示出 2–5 倍潜在成本优势，但仍把生产硬化视为独立阶段。",
+      "why": "它把“Agent 写代码”改造成“Agent 写可证明规范”，为长任务中的生成速度与验证能力失衡提供了具体架构。",
+      "url": "https://claude.com/blog/how-datadog-built-a-universal-machine-tool-for-claude-code",
+      "tags": [
+        "Claude Code",
+        "形式化验证",
+        "规范驱动",
+        "Agent 工具"
+      ]
+    },
     {
       "category": "代码维护",
       "sourceType": "arxiv",
@@ -20,159 +54,6 @@
         "可维护性",
         "Agent 轨迹",
         "补丁优化"
-      ]
-    },
-    {
-      "category": "Agent 调试",
-      "sourceType": "arxiv",
-      "source": "Kunlun Zhu 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "10 min",
-      "title": "AgentDebugX 打通 Agent 故障检测、归因、恢复与重跑",
-      "summary": "AgentDebugX 将调试组织为检测、归因、恢复和重跑的闭环，重点解决故障暴露步骤与根因步骤不一致的问题。其 DeepDebug 结合全局轨迹理解、结构化调查和交叉质询定位根因，在测试的开放权重模型上将严格的 Agent 与步骤联合归因准确率提升至 28.8%。在 GAIA 上，它单次重跑修复了 73 个失败任务中的 13 个，使总体准确率从 55.8% 提升到 63.6%。",
-      "why": "它把追踪日志从被动回放升级为可执行的根因诊断与恢复机制，适合构建生产 Agent 的故障回归库和自动恢复管线。",
-      "url": "https://arxiv.org/abs/2607.18754",
-      "tags": [
-        "Agent 调试",
-        "故障归因",
-        "自动恢复",
-        "可观测性"
-      ]
-    },
-    {
-      "category": "Agent 安全",
-      "sourceType": "arxiv",
-      "source": "Akansha Shukla 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "9 min",
-      "title": "预部署加固管线系统性降低 Agent 应用的数据泄漏",
-      "summary": "该工作在部署前扫描提示模板、工具接口和工具调用代码，定位可能造成数据泄漏或工具滥用的模式，并自动生成最小侵入式修复。修复手段包括收紧 schema、边界净化、工具白名单和最小权限检查，随后用攻击性提示注入与正常输入共同验证。对五个真实应用及 AgentDojo 的评测显示，基础越狱和指令覆盖攻击下的泄漏被完全消除，压力操纵场景下泄漏减少 91%。",
-      "why": "这种“扫描—修补—对抗验证”流程可直接嵌入 Agent 应用的 CI，在运行时策略之外提供可审计的代码级安全基线。",
-      "url": "https://arxiv.org/abs/2607.18847",
-      "tags": [
-        "Agent 安全",
-        "提示注入",
-        "数据泄漏",
-        "最小权限"
-      ]
-    },
-    {
-      "category": "上下文工程",
-      "sourceType": "arxiv",
-      "source": "Yuhang Wang 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "8 min",
-      "title": "SWE-Pruner Pro 用编码模型自身表征裁剪工具输出",
-      "summary": "SWE-Pruner Pro 发现编码模型读取工具结果时，其内部表征已经包含逐行相关性信号，因此无需额外代码分类器即可完成上下文裁剪。一个轻量预测头直接为工具输出的每一行生成保留或删除标签，并结合长度感知嵌入处理不同规模的结果。在两个开放权重骨干和四个多轮基准上，它最多节省 39% 的提示与生成 token，同时保持任务质量，并在部分设置下提升 SWE-bench Verified 和 Oolong 成绩。",
-      "why": "方法把上下文管理内化到编码 Agent，可减少长任务中的 token 与延迟开销，也避免维护独立裁剪模型。",
-      "url": "https://arxiv.org/abs/2607.18213",
-      "tags": [
-        "编码 Agent",
-        "上下文裁剪",
-        "SWE-bench",
-        "推理效率"
-      ]
-    },
-    {
-      "category": "程序修复",
-      "sourceType": "arxiv",
-      "source": "Tianyue Jiang 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "9 min",
-      "title": "PhoenixRepair 扩展软件 Agent 的修复策略搜索空间",
-      "summary": "PhoenixRepair 针对现有软件修复 Agent 只探索少量编辑位置和少量补丁尝试的问题，引入多位置采样、可选的图结构定位以及多轮反思与细化。最终生成阶段会汇总历史尝试中的有效信息，而不是丢弃失败轨迹。在 SWE-bench Verified 上，它相对 SWE-agent 在 DeepSeek-V3.1 设置下提升 7.8%，并在 MiniMax-M2.5 设置下达到 76.0% Pass@1。",
-      "why": "结果说明修复能力不仅取决于基础模型，也取决于如何分配搜索预算和复用失败经验，对修复 Agent 的编排设计具有直接参考价值。",
-      "url": "https://arxiv.org/abs/2607.18859",
-      "tags": [
-        "程序修复",
-        "多 Agent",
-        "SWE-bench",
-        "搜索策略"
-      ]
-    },
-    {
-      "category": "需求追踪",
-      "sourceType": "arxiv",
-      "source": "Mingyu Chen 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "10 min",
-      "title": "TraceDev 用可追踪图连接需求、设计与仓库级代码",
-      "summary": "TraceDev 面向复杂自然语言需求到仓库级代码的端到端开发，设置需求细化、设计、开发、测试和验证五类 Agent。验证 Agent 维护一张连接需求、设计模型和代码产物的异构追踪图，既约束跨阶段一致性，也为其他 Agent 提供结构化记忆。在两个含 125 个用例的数据集上，框架分别达到 53.63% 和 56.82% 的成功率，相对基线取得显著提升。",
-      "why": "可追踪图为 Agent 生成的需求实现建立了逐项验证路径，适合需要审计、变更影响分析和验收证据的工程流程。",
-      "url": "https://arxiv.org/abs/2607.18886",
-      "tags": [
-        "需求工程",
-        "代码生成",
-        "可追踪性",
-        "多 Agent"
-      ]
-    },
-    {
-      "category": "软件测试",
-      "sourceType": "arxiv",
-      "source": "Ruogu Yang 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "8 min",
-      "title": "LISA 以 LLM 生成程序不变量发现功能性缺陷",
-      "summary": "LISA 针对传统模糊测试偏重崩溃、难以发现语义错误的问题，让 LLM 结合源码与文档生成 API 调用序列和程序不变量。系统使用 API n-gram 反馈迭代扩展测试，并把发现整理为供开发者确认的高置信度缺陷候选。论文报告其缺陷发现率高于模糊测试和既有 LLM 测试生成方法，同时保持有竞争力的代码覆盖率。",
-      "why": "不变量提供了比单纯崩溃更适合功能正确性的测试判据，可用于增强库级 API 的自动化回归测试。",
-      "url": "https://arxiv.org/abs/2607.18711",
-      "tags": [
-        "软件测试",
-        "程序不变量",
-        "功能缺陷",
-        "LLM"
-      ]
-    },
-    {
-      "category": "科学代码",
-      "sourceType": "arxiv",
-      "source": "Weifeng Sun 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "9 min",
-      "title": "SciCodePile 建立 128GB 科学代码语料与可执行基准",
-      "summary": "SciCodePile 从 37,737 个公开仓库构建了覆盖多类计算科学领域的 128GB 代码语料，并整理出 200 个带沙箱和自动测试的可执行任务。对 15 个开放与闭源模型的评测显示，最强模型在可执行代码生成上仅有 12.30% Pass@1。持续预训练与指令微调分别带来 2.84 倍的 CodeBLEU 和 4.79 倍的 Pass@1 改善，说明领域数据仍是科学代码生成的关键瓶颈。",
-      "why": "该数据集把科学代码能力从文本相似度推进到可执行验证，可用于评估和训练面向科研软件的编码模型。",
-      "url": "https://arxiv.org/abs/2607.19104",
-      "tags": [
-        "科学代码",
-        "可执行评测",
-        "代码语料",
-        "领域微调"
-      ]
-    },
-    {
-      "category": "推理优化",
-      "sourceType": "arxiv",
-      "source": "Yu-Yang Qian 等",
-      "publishedAt": "2026-07-21",
-      "readTime": "8 min",
-      "title": "AdaFlash 自适应扩散草稿提升大模型推理吞吐",
-      "summary": "AdaFlash 研究扩散草稿模型用于推测解码时的核心不稳定性：双向注意力虽然支持并行生成，却会造成跨领域接受率波动和不同 token 位置的质量差异。方法用反向 KL 的在线策略蒸馏降低领域级方差，再用自适应长度头动态决定候选序列长度，减少目标模型的验证开销。实验显示其部署吞吐持续优于既有方法，高并发场景最高提升约 66%。",
-      "why": "它把草稿长度从固定超参数改为按请求动态决策，为高并发 LLM 服务优化提供了更细粒度的成本控制点。",
-      "url": "https://arxiv.org/abs/2607.19223",
-      "tags": [
-        "推测解码",
-        "扩散模型",
-        "推理加速",
-        "吞吐"
-      ]
-    },
-    {
-      "category": "Skill 生命周期",
-      "sourceType": "arxiv",
-      "source": "Haodi Fan、Zucong Lan",
-      "publishedAt": "2026-07-21",
-      "readTime": "10 min",
-      "title": "Skillware 将 Agent Skill 定义为独立的软件生命周期对象",
-      "summary": "论文把跨 Agent 系统复用的 Skill 抽象为持久化行为制品，并提出 Skillware 作为具有独立身份和生命周期的软件单元。作者用行为优先、独立软件身份和 Agent Host 执行关系三个条件划定边界，同时把更新、维护、回滚和删除纳入生命周期连续性。论证基于 138,133 个去重后的 SKILL.md 记录、20,556 个仓库标识以及一组边界案例和工程实现。",
-      "why": "这一抽象为 Skill 的版本、依赖、测试、发布和回滚提供统一语义，有助于把零散提示资产纳入常规软件供应链治理。",
-      "url": "https://arxiv.org/abs/2607.18970",
-      "tags": [
-        "Agent Skill",
-        "软件生命周期",
-        "行为制品",
-        "版本治理"
       ]
     },
     {
@@ -193,6 +74,91 @@
       ]
     },
     {
+      "category": "Agent 知识",
+      "sourceType": "blog",
+      "source": "kapa.ai、Finn Bauer",
+      "publishedAt": "2026-07-21",
+      "readTime": "7 min",
+      "title": "1192 次对话显示：文档搜索是产品 Agent 的核心工具",
+      "summary": "kapa.ai 检查了内嵌产品 Agent 的 1192 次对话：它有约 30 个原生工具和一个知识库搜索工具，后者调用量几乎等于其他工具总和。32.1% 的对话里，文档用于回答原生工具未覆盖的产品问题；约 7% 的对话同时调用原生工具与文档，以组合当前账户状态与产品语义。更关键的是，Agent 会先查文档理解“负面反馈”等业务概念，再映射到实际存在的 downvote 和反馈过滤器，说明文档也参与规划，而不只负责回答。",
+      "why": "设计产品 Agent 时，文档不只是 RAG 兜底，而是工具选择和语义映射的控制面；这组真实使用数据可指导工具接口与知识库预算。",
+      "url": "https://www.cncf.io/blog/2026/07/21/why-your-agent-needs-access-to-your-documentation/",
+      "tags": [
+        "知识库",
+        "工具选择",
+        "产品 Agent",
+        "RAG"
+      ]
+    },
+    {
+      "category": "Agent 调试",
+      "sourceType": "arxiv",
+      "source": "Kunlun Zhu 等",
+      "publishedAt": "2026-07-21",
+      "readTime": "10 min",
+      "title": "AgentDebugX 打通 Agent 故障检测、归因、恢复与重跑",
+      "summary": "AgentDebugX 将调试组织为检测、归因、恢复和重跑的闭环，重点解决故障暴露步骤与根因步骤不一致的问题。其 DeepDebug 结合全局轨迹理解、结构化调查和交叉质询定位根因，在测试的开放权重模型上将严格的 Agent 与步骤联合归因准确率提升至 28.8%。在 GAIA 上，它单次重跑修复了 73 个失败任务中的 13 个，使总体准确率从 55.8% 提升到 63.6%。",
+      "why": "它把追踪日志从被动回放升级为可执行的根因诊断与恢复机制，适合构建生产 Agent 的故障回归库和自动恢复管线。",
+      "url": "https://arxiv.org/abs/2607.18754",
+      "tags": [
+        "Agent 调试",
+        "故障归因",
+        "自动恢复",
+        "可观测性"
+      ]
+    },
+    {
+      "category": "Agent 运行时",
+      "sourceType": "website",
+      "source": "Cloudflare、Devin",
+      "publishedAt": "2026-07-21",
+      "readTime": "6 min",
+      "title": "Cloudflare 让每个 Devin 会话运行在独立容器沙箱",
+      "summary": "Cloudflare 发布 Devin Outposts 模板，把每个 Devin 会话放进独立的 Cloudflare Container，由 Worker 协调会话生命周期。定时触发器每分钟轮询待运行会话并启动专属容器；挂起时把 /root、/workspace 和 /opt/devin-persistent 归档到 R2，恢复时还原，终止时删除容器与检查点。部署同时创建 Worker、Container 与 cron trigger，并把服务令牌存为 Worker Secret；文档明确检查点不是连续备份，且单个压缩包受 R2 5 GiB 上传限制。",
+      "why": "这是 Coding Agent 隔离运行、持久化和回收的一套可复用参考架构，清楚揭示了控制面、执行面与状态存储的边界。",
+      "url": "https://developers.cloudflare.com/changelog/post/2026-07-21-devin-outposts/",
+      "tags": [
+        "Devin",
+        "沙箱",
+        "容器",
+        "会话生命周期"
+      ]
+    },
+    {
+      "category": "上下文工程",
+      "sourceType": "arxiv",
+      "source": "Yuhang Wang 等",
+      "publishedAt": "2026-07-21",
+      "readTime": "8 min",
+      "title": "SWE-Pruner Pro 用编码模型自身表征裁剪工具输出",
+      "summary": "SWE-Pruner Pro 发现编码模型读取工具结果时，其内部表征已经包含逐行相关性信号，因此无需额外代码分类器即可完成上下文裁剪。一个轻量预测头直接为工具输出的每一行生成保留或删除标签，并结合长度感知嵌入处理不同规模的结果。在两个开放权重骨干和四个多轮基准上，它最多节省 39% 的提示与生成 token，同时保持任务质量；部分设置下 SWE-bench Verified 解决率提升 3.8 个百分点，Oolong 准确率提升 2.2 个百分点。",
+      "why": "方法把上下文管理内化到编码 Agent，可减少长任务中的 token 与延迟开销，也避免维护独立裁剪模型。",
+      "url": "https://arxiv.org/abs/2607.18213",
+      "tags": [
+        "编码 Agent",
+        "上下文裁剪",
+        "SWE-bench",
+        "推理效率"
+      ]
+    },
+    {
+      "category": "可复现数据工程",
+      "sourceType": "substack",
+      "source": "Alex Merced",
+      "publishedAt": "2026-07-21",
+      "readTime": "18 min",
+      "title": "把 Agent 限定在生成制品，让确定性流水线负责执行",
+      "summary": "Alex Merced 提出“Agent 生成、制品执行”：模型在开发阶段生成 SQL、dbt 模型、流水线代码和测试，运行时只执行已版本化、评审和验证的确定性制品。文章用五级确定性阶梯区分聊天复制、临时 Agent 查询、人工评审制品、自动验证制品和由定时 Agent 提交 PR 的维护体系，并给出只读凭据、dry-run、schema pinning、语义层和 golden dataset 等控制。核心边界是探索可以非确定，但进入生产或对外引用的数字必须提升为可追溯、可重跑的仓库制品。",
+      "why": "对用 Codex、Claude Code 等处理数据任务的团队，这是一套可以直接转写为 AGENTS.md、hooks 和 CI 门禁的工程规范。",
+      "url": "https://amdatalakehouse.substack.com/p/deterministic-data-engineering-with",
+      "tags": [
+        "确定性",
+        "制品化",
+        "CI",
+        "数据治理"
+      ]
+    },
+    {
       "category": "平台工程",
       "sourceType": "blog",
       "source": "CNCF、Lakmal Warusawithana",
@@ -207,6 +173,40 @@
         "云原生",
         "Agent 治理",
         "身份权限"
+      ]
+    },
+    {
+      "category": "开源发布",
+      "sourceType": "github",
+      "source": "OpenHands",
+      "publishedAt": "2026-07-21",
+      "readTime": "3 min",
+      "title": "OpenHands 1.47.0 加固云端 Agent 的身份与自动化链路",
+      "summary": "OpenHands cloud 1.47.0 将 Agent Canvas 置于 SaaS 身份验证之后，并修复云启动中的 Agent Profile 应用、自动化登录跳转和托管 LLM 密钥刷新等问题。运行时 API 的幂等读取新增一次超时重试，临时身份提供方错误不再直接登出用户，API 密钥验证的 last_used_at 写入也做了去抖。版本同时升级 Vite 修复 CVE-2026-53571，显示产品成熟度工作主要落在权限、会话连续性和凭据生命周期。",
+      "why": "这些变化比新增一个 Agent 能力更接近生产痛点：身份边界、短暂故障容错和密钥刷新会直接决定长任务是否稳定可控。",
+      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.47.0",
+      "tags": [
+        "OpenHands",
+        "身份认证",
+        "凭据管理",
+        "自动化"
+      ]
+    },
+    {
+      "category": "推理优化",
+      "sourceType": "arxiv",
+      "source": "Yu-Yang Qian 等",
+      "publishedAt": "2026-07-21",
+      "readTime": "8 min",
+      "title": "AdaFlash 自适应扩散草稿提升大模型推理吞吐",
+      "summary": "AdaFlash 研究扩散草稿模型用于推测解码时的核心不稳定性：双向注意力虽然支持并行生成，却会造成跨领域接受率波动和不同 token 位置的质量差异。方法用反向 KL 的在线策略蒸馏降低领域级方差，再用自适应长度头动态决定候选序列长度，减少目标模型的验证开销。实验显示其部署吞吐持续优于既有方法，高并发场景最高提升约 66%。",
+      "why": "它把草稿长度从固定超参数改为按请求动态决策，为高并发 LLM 服务优化提供了更细粒度的成本控制点。",
+      "url": "https://arxiv.org/abs/2607.19223",
+      "tags": [
+        "推测解码",
+        "扩散模型",
+        "推理加速",
+        "吞吐"
       ]
     }
   ]
