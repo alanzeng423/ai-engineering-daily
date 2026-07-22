@@ -73,11 +73,6 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="AI Engineering Daily 首页">
           AI Engineering Daily
         </a>
-        <nav aria-label="主要导航">
-          <a className="active" href="#digest">日报</a>
-          <a href="#about">关于</a>
-        </nav>
-        <div className="header-meta">每天 09:30 更新</div>
       </header>
 
       <section className="digest" id="digest">
@@ -91,7 +86,7 @@ export default function Home() {
             <span>
               {latestDigest.issue > 0 && digestDate
                 ? `${digestDate} · ${stories.length} 篇`
-                : "每天 09:30 更新"}
+                : "内容准备中"}
             </span>
           </div>
           <p>{latestDigest.overview}</p>
@@ -166,7 +161,7 @@ export default function Home() {
           {filteredStories.length === 0 && (
             <div className="empty-state">
               <span>{stories.length === 0 ? "首期内容准备中" : "暂无匹配内容"}</span>
-              <p>{stories.length === 0 ? "下一次更新：每天 09:30" : "请尝试其他关键词或主题。"}</p>
+              {stories.length > 0 && <p>请尝试其他关键词或主题。</p>}
             </div>
           )}
         </div>
@@ -174,7 +169,6 @@ export default function Home() {
 
       <footer id="about">
         <div className="brand footer-brand">AI Engineering Daily</div>
-        <p>每天 09:30 更新</p>
         <p className="footer-note">AI research and engineering</p>
       </footer>
     </main>
