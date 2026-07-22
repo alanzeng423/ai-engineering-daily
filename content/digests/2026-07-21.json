@@ -6,7 +6,7 @@
   "overview": "当天的核心进展集中在把 AI Agent 从“能生成结果”推进到可维护、可验证、可治理的工程系统。研究工作分别处理代码冗余、上下文裁剪、故障归因、修复搜索、需求追踪、功能测试与数据泄漏，显示可靠性越来越取决于模型外部的执行与验证闭环。与此同时，推理加速、技能生命周期和统一平台治理也在补齐大规模部署所需的基础设施。",
   "items": [
     {
-      "category": "AI4SE",
+      "category": "代码维护",
       "source": "Alex Mathai 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -22,7 +22,7 @@
       ]
     },
     {
-      "category": "AGENT",
+      "category": "Agent 调试",
       "source": "Kunlun Zhu 等",
       "publishedAt": "2026-07-21",
       "readTime": "10 min",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "category": "AGENT",
+      "category": "Agent 安全",
       "source": "Akansha Shukla 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "category": "CODING AGENT",
+      "category": "上下文工程",
       "source": "Yuhang Wang 等",
       "publishedAt": "2026-07-21",
       "readTime": "8 min",
@@ -70,7 +70,7 @@
       ]
     },
     {
-      "category": "CODING AGENT",
+      "category": "程序修复",
       "source": "Tianyue Jiang 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -86,7 +86,7 @@
       ]
     },
     {
-      "category": "AI4SE",
+      "category": "需求追踪",
       "source": "Mingyu Chen 等",
       "publishedAt": "2026-07-21",
       "readTime": "10 min",
@@ -102,7 +102,7 @@
       ]
     },
     {
-      "category": "AI4SE",
+      "category": "软件测试",
       "source": "Ruogu Yang 等",
       "publishedAt": "2026-07-21",
       "readTime": "8 min",
@@ -118,7 +118,7 @@
       ]
     },
     {
-      "category": "AI4SE",
+      "category": "科学代码",
       "source": "Weifeng Sun 等",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -134,7 +134,7 @@
       ]
     },
     {
-      "category": "LLM",
+      "category": "推理优化",
       "source": "Yu-Yang Qian 等",
       "publishedAt": "2026-07-21",
       "readTime": "8 min",
@@ -150,7 +150,7 @@
       ]
     },
     {
-      "category": "SOFTWARE ENGINEERING",
+      "category": "Skill 生命周期",
       "source": "Haodi Fan、Zucong Lan",
       "publishedAt": "2026-07-21",
       "readTime": "10 min",
@@ -166,7 +166,7 @@
       ]
     },
     {
-      "category": "AGENT",
+      "category": "Agent 交付",
       "source": "Harness、Jyoti Bansal",
       "publishedAt": "2026-07-21",
       "readTime": "9 min",
@@ -182,7 +182,7 @@
       ]
     },
     {
-      "category": "SOFTWARE ENGINEERING",
+      "category": "平台工程",
       "source": "CNCF、Lakmal Warusawithana",
       "publishedAt": "2026-07-21",
       "readTime": "11 min",
