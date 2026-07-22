@@ -14,7 +14,9 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "digest:check": "node scripts/check-content.mjs",
     "digest:validate": "node scripts/validate-digest.mjs",
-    "digest:publish": "node scripts/publish-digest.mjs"
+    "digest:publish": "node scripts/publish-digest.mjs",
+    "research:init": "node scripts/init-research-run.mjs",
+    "research:validate": "node scripts/validate-research-run.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

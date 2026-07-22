@@ -54,6 +54,39 @@ npm test
 
 The daily automation follows this workflow, commits only the published content
 files, and pushes `main`. Cloudflare Workers Builds then deploys that commit.
+Its versioned prompt is stored in `automation/daily-digest-prompt.md`.
+
+## Research run archive
+
+Every automation run has a separate, append-only local archive under
+`research/runs/YYYY-MM-DD/<run-id>/`. A rerun never reuses the previous run
+directory. The archive contains:
+
+- `retrievals/*.json`: one immutable record for every search, feed/API request,
+  repository lookup, social lookup, and original-source read;
+- `queries.json`: the complete query ledger and its retrieval batch IDs;
+- `candidates.json`: the normalized candidate pool, including duplicates;
+- `verification.json`: date checks, access results, source metadata, evidence,
+  and rejection reasons for every candidate;
+- `scores.json`: the score breakdown or an explicit reason why a candidate was
+  not scored;
+- `selection.json`: all selected and rejected candidate IDs and the constraints
+  used for the decision;
+- `digest.json`: the exact final digest before publication;
+- `checks.json`, `manifest.json`, and `events.ndjson`: command, Git, deployment,
+  lifecycle, count, failure, and stage records.
+
+These research artifacts and `content/inbox/` drafts stay local and are ignored
+by Git, so they are not exposed by the public repository or website. Published
+digests remain versioned in Git.
+
+Initialize and validate a run with:
+
+```bash
+npm run research:init -- YYYY-MM-DD
+npm run research:validate -- research/runs/YYYY-MM-DD/<run-id>
+npm run research:validate -- research/runs/YYYY-MM-DD/<run-id> --complete
+```
 
 ## Deployment
 
