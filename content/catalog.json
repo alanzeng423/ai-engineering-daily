@@ -1,13 +1,99 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-22T08:24:00.000Z",
-  "latestDigestDate": "2026-07-21",
-  "total": 43,
+  "generatedAt": "2026-07-23T01:46:00.000Z",
+  "latestDigestDate": "2026-07-22",
+  "total": 48,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-21"
+    "to": "2026-07-22"
   },
   "items": [
+    {
+      "category": "确定性门禁",
+      "sourceType": "reddit",
+      "source": "mastafied",
+      "publishedAt": "2026-07-22",
+      "readTime": "5 min",
+      "title": "16 个 Agent 的小型业务复盘：关键规则最终都移出了提示词",
+      "summary": "作者用约 16 个 Claude 与 Codex Agent 处理获客、CRM、内容和会议准备，报告 214 封冷邮件获得 3.3% 回复率，并独立找到一个试点客户。主要故障是文案 Agent 虚构产品能力；仅写入提示的禁令无法根除问题，后来增加独立 QA Agent，按允许声明清单拒绝草稿。禁止联系名单等不可妥协规则进一步下沉到 API 层，由发送端点直接拒绝。",
+      "why": "这份小样本生产复盘提供了从提示约束迁移到声明核验和代码门禁的具体路径，也提醒团队把 Agent 的价值与真实漏斗结果和拒绝记录连接起来。",
+      "url": "https://www.reddit.com/r/AI_Agents/comments/1v3ft8c/running_16_agents_for_a_one_person_business_while/",
+      "tags": [
+        "生产实践",
+        "声明核验",
+        "API 门禁",
+        "Agent 运营"
+      ]
+    },
+    {
+      "category": "工具选型",
+      "sourceType": "blog",
+      "source": "GitHub、Andrea Griffiths",
+      "publishedAt": "2026-07-22",
+      "readTime": "5 min",
+      "title": "选 Copilot 还是原始 API，关键在于团队要负责哪一层",
+      "summary": "GitHub 将 Copilot 与原始模型 API 的差异拆成工作流责任：模型调用之外，还包括上下文选择、工具、重试、日志、安全、仓库指令、组织策略与从 Issue 到已审查 PR 的交付路径。其受控评测固定模型、任务、上下文、推理强度、工具和 MCP 服务，在五个基准上比较 Harness；GitHub 称 Copilot CLI 在多数配置中以更少 token 达到任务解决率持平。BYOK 则保留 Copilot 的 Harness 和集成，由外部提供商承担模型账单。",
+      "why": "团队可以据此把“模型单价”改写为“完成任务所需的系统所有权与总成本”，更清楚地判断购买工具、嵌入 SDK 或自建 Agent 平台。",
+      "url": "https://github.blog/ai-and-ml/github-copilot/copilot-vs-raw-api-access-what-are-you-actually-paying-for/",
+      "tags": [
+        "GitHub Copilot",
+        "Harness",
+        "BYOK",
+        "成本模型"
+      ]
+    },
+    {
+      "category": "运行时治理",
+      "sourceType": "github",
+      "source": "Anthropic",
+      "publishedAt": "2026-07-22",
+      "readTime": "5 min",
+      "title": "Claude Code 2.1.217 收紧工作区隔离与子 Agent 资源边界",
+      "summary": "Claude Code v2.1.217 修复后台会话未规范化符号链接工作目录的问题，避免会话越出预期工作区；同时为 CLAUDE.md 或 SKILL.md 路径的 brace expansion 加入预算上限，防止启动时 OOM 或卡死。版本默认最多并发 20 个子 Agent，默认禁止子 Agent 再嵌套派生，并让 --max-budget-usd 在达到上限后拒绝新任务并停止正在运行的后台 Agent。更新还修复截断 MCP 输出长期占用完整结果内存、企业 TLS/OAuth/代理设置失效等问题。",
+      "why": "这组改动把工作区、内存、并发、嵌套和费用从提示约定变成运行时强制边界，适合用作多 Agent 执行环境的控制项清单。",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.217",
+      "tags": [
+        "Claude Code",
+        "最小权限",
+        "资源限制",
+        "预算控制"
+      ]
+    },
+    {
+      "category": "故障恢复",
+      "sourceType": "arxiv",
+      "source": "Qijia He 等",
+      "publishedAt": "2026-07-22",
+      "readTime": "8 min",
+      "title": "CodeRescue: Budget-Calibrated Recovery Routing for Coding Agents",
+      "subtitle": "CodeRescue 在廉价重试与强模型升级之间校准恢复成本",
+      "summary": "CodeRescue 处理编码 Agent 失败后的预算决策：继续让廉价模型利用执行反馈恢复，还是升级到更强模型。方法从执行 rollout 训练监督路由器，再用 Conformal Risk Control 在部署时选择成本惩罚，无需重新训练。五个编码基准显示两类恢复动作具有互补成功模式；在 GPT-5.4-nano/GPT-5.4 设置中，一个校准点以始终升级方案 35% 的平均恢复成本取得更高解决率。",
+      "why": "它把失败恢复从固定级联改造成可按预算校准的路由问题，可直接影响 Coding Agent 的模型组合、重试策略和单位解决成本。",
+      "url": "https://arxiv.org/abs/2607.19338",
+      "tags": [
+        "编码 Agent",
+        "成本优化",
+        "执行反馈",
+        "Conformal Risk Control"
+      ]
+    },
+    {
+      "category": "效能度量",
+      "sourceType": "blog",
+      "source": "GitHub",
+      "publishedAt": "2026-07-22",
+      "readTime": "3 min",
+      "title": "GitHub 用采用阶段而非活跃人数衡量 Copilot 影响",
+      "summary": "GitHub 新增 Copilot usage metrics impact dashboard，把用户分成被动、代码优先、Agent 优先以及多 Agent 或 Copilot App 四类。每类展示月均合并 PR、合并速度中位数、用户占比与人均每日代码行数，并提供六个月的群体变化和 PR 吞吐趋势。分类沿用 usage metrics API 的 ai_adoption_phase，依据滚动 28 天产品使用行为生成。",
+      "why": "它提供了一套从席位活跃度走向采用深度与交付结果的度量框架，但团队仍应结合质量、返工和业务结果避免把代码行数单独当作生产力。",
+      "url": "https://github.blog/changelog/2026-07-22-new-copilot-usage-metrics-impact-dashboard/",
+      "tags": [
+        "GitHub Copilot",
+        "开发者效能",
+        "采用度量",
+        "交付分析"
+      ]
+    },
     {
       "category": "Agent 知识",
       "sourceType": "blog",
