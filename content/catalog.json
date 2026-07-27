@@ -1,13 +1,168 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-27T03:59:00.000Z",
-  "latestDigestDate": "2026-07-23",
-  "total": 60,
+  "generatedAt": "2026-07-27T04:34:02.000Z",
+  "latestDigestDate": "2026-07-24",
+  "total": 69,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-23"
+    "to": "2026-07-24"
   },
   "items": [
+    {
+      "category": "学习式视频编码",
+      "sourceType": "blog",
+      "source": "Microsoft MLVC Team",
+      "publishedAt": "2026-07-24",
+      "readTime": "7 min",
+      "title": "微软开源 MLVC：让端到端学习式视频编码运行在通用 NPU",
+      "summary": "MLVC 用端到端率失真训练的神经网络构建视频编解码路径，并针对 Apple、Intel 与 Qualcomm 的通用 NPU 实时运行。基于 VCD 数据集的 P.910 主观测试显示，在 360p 相同质量条件下，所需码率相对 H.264 降低 87.8%、相对 H.265 降低 75.5%，约为 122 kbps 对 1 Mbps H.264；系统还演示了 540p/30fps。微软同时公开模型、权重、训练与平台转换资产，并说明 Teams 上线采用遥测、A/B 测试和回退机制。",
+      "why": "它把 learned codec 的主观质量、跨 NPU 实时运行和生产灰度放在同一证据链里，适合评估端侧视频栈的码率收益、复现成本与回退设计。",
+      "url": "https://techcommunity.microsoft.com/blog/linuxandopensourceblog/announcing-the-open-source-release-of-ml-video-codec-mlvc/4539875",
+      "tags": [
+        "端侧推理",
+        "NPU",
+        "率失真优化",
+        "开源模型"
+      ]
+    },
+    {
+      "category": "MoE 量化",
+      "sourceType": "huggingface",
+      "source": "Daewoo Myoung",
+      "publishedAt": "2026-07-24",
+      "readTime": "12 min",
+      "title": "用约 120 行 NF4 模块补上 743B 融合 MoE 的 QLoRA 量化缺口",
+      "summary": "现有按模块替换的量化器无法触达融合 MoE 的三维专家张量，作者实现约 120 行 NF4 模块，只反量化被路由到的专家，并补上低峰值加载、检查点与按 token 预算组批路径。以 GLM-5.2 为例，权重体积由约 1.49 TB 降至 414 GB；真实 743B 冒烟测试得到有限 loss 6.80、projector 梯度范数 405.8，且没有 CPU 溢出。按 token 预算组批达到基线 5.5 倍吞吐，配套代码以 Apache-2.0 发布。",
+      "why": "这份实现把超大融合 MoE 的低秩微调从概念压到可检查的加载、梯度和吞吐路径，可直接用于评估现有量化工具的覆盖缺口与硬件预算。",
+      "url": "https://huggingface.co/blog/dwmyoung/nf4moe-qlora-743b",
+      "tags": [
+        "QLoRA",
+        "显存优化",
+        "专家路由",
+        "吞吐"
+      ]
+    },
+    {
+      "category": "本地编码 Agent",
+      "sourceType": "arxiv",
+      "source": "Mack Nixon 等",
+      "publishedAt": "2026-07-24",
+      "readTime": "8 min",
+      "title": "Agentic coding without the cloud: evaluating open-weight large language models on longitudinal data preparation tasks",
+      "subtitle": "开放基准检验本地 Coding Agent 处理纵向研究数据的可行性",
+      "summary": "研究面向数据治理不允许上传云端的场景，构建了一个本地 Coding Agent 开放基准，覆盖六轮 cohort sweep、20 项 R 数据准备任务和 102 个目标变量，并自动核验输出。实验在消费级硬件上运行开放权重模型，其中 31B–35B 模型的平均任务完成率最高达到 87.9%。这把隐私约束下的可行性检验从通用代码题转向纵向研究数据处理。",
+      "why": "团队可以据此评估本地模型是否足以承担受限数据准备，并把硬件、治理要求和任务级成功率一同纳入云端与本地 Agent 的选型。",
+      "url": "https://arxiv.org/abs/2607.21482",
+      "tags": [
+        "开放模型",
+        "数据治理",
+        "开放基准",
+        "R"
+      ]
+    },
+    {
+      "category": "研究 Agent",
+      "sourceType": "arxiv",
+      "source": "Shuqi Lu 等",
+      "publishedAt": "2026-07-24",
+      "readTime": "8 min",
+      "title": "AREX: Towards a Recursively Self-Improving Agent for Deep Research",
+      "subtitle": "AREX 用约束审计和定向补搜驱动递归式深度研究",
+      "summary": "AREX 把内层证据循环与外层约束审计结合：系统先核验当前发现，再围绕未满足约束发起定向检索，并用学习式上下文更新工具维护可用状态。作者通过 Agentic mid-training 与长时程强化学习训练 4B 稠密和 122B-A10B MoE 两种变体。摘要报告其在 BrowseComp、WideSearch、DeepSearchQA、HLE 等任务上优于同规模基线，但没有披露具体差值。",
+      "why": "它把“已经找到什么”和“约束还缺什么”显式做成研究控制器，为长时检索 Agent 的停止条件、补搜策略和上下文更新提供了可复用架构。",
+      "url": "https://arxiv.org/abs/2607.21461",
+      "tags": [
+        "约束审计",
+        "定向检索",
+        "上下文管理",
+        "Agent 训练"
+      ]
+    },
+    {
+      "category": "开发模型",
+      "sourceType": "blog",
+      "source": "GitHub",
+      "publishedAt": "2026-07-24",
+      "readTime": "3 min",
+      "title": "Claude Opus 5 进入 GitHub Copilot，并带上策略、计费与安全边界",
+      "summary": "GitHub 开始把 Claude Opus 5 逐步部署到 VS Code、Visual Studio、Copilot CLI、云端 Agent、移动端和多款 IDE。其早期测试观察到模型能执行定向自主修改、回归验证和多工具协作，并减少复杂任务中的无效执行，但公告没有给出量化基准。企业管理员需要通过策略启用模型，使用费用按提供商 API 标价进入按量账单，高风险网络安全请求还受额外拦截。",
+      "why": "模型选型不能只看编码能力，还应同时验证可用界面、组织策略、安全误拦截和长任务成本；该发布把这些运行约束放进同一决策面。",
+      "url": "https://github.blog/changelog/2026-07-24-claude-opus-5-is-now-available-in-github-copilot/",
+      "tags": [
+        "GitHub Copilot",
+        "Claude",
+        "工具调用",
+        "成本模型"
+      ]
+    },
+    {
+      "category": "调度 Agent",
+      "sourceType": "blog",
+      "source": "JAMS Software",
+      "publishedAt": "2026-07-24",
+      "readTime": "5 min",
+      "title": "JAMS 将 MCP 接入企业作业调度，并把写操作置于审批与审计之下",
+      "summary": "JAMS 发布文档驱动的 JAX 助手与 JAMS MCP，让 Cursor、Copilot、Claude 和 Codex 能查询并操作企业作业调度。官方说明 MCP 沿用登录用户权限，不设置高权限 AI 账户；写操作需要审批，并进入专用操作日志与既有 API 审计轨迹，也可选择本地或境内模型。当前版本不能编辑或删除作业、文件夹、计划和 Agent 定义，相关能力已随 JAMS Web 正式提供。",
+      "why": "这是一份把 MCP 接入最小权限、人工审批、数据驻留与审计日志的具体实现边界，可用于审查企业 Agent 是否绕过现有控制面。",
+      "url": "https://www.prnewswire.com/apac/news-releases/jams-launches-ai-for-enterprise-job-scheduling-jax-and-jams-mcp-302833800.html",
+      "tags": [
+        "MCP",
+        "最小权限",
+        "人工审批",
+        "审计日志"
+      ]
+    },
+    {
+      "category": "数据库驱动",
+      "sourceType": "github",
+      "source": "Microsoft mssql-python",
+      "publishedAt": "2026-07-24",
+      "readTime": "4 min",
+      "title": "mssql-python 1.12 拆分 ODBC 二进制并修复批量复制超时",
+      "summary": "mssql-python v1.12.0 将 ODBC 二进制拆到配套纯数据包，并保留打包回退路径，官方称这一拆分不破坏现有安装。加载器同时处理 GIL 与 Alpine/musl 安全性，bulkcopy 现在会遵循连接超时，自定义 CLR UDT 字节也可通过 varbinary(max) 传输。变化集中在容器依赖、原生库加载和批量写入三条容易出现环境差异的路径。",
+      "why": "升级前应在目标镜像和真实批量负载上验证二进制回退、超时与 UDT 映射；这些细节直接影响 CI、容器发布和故障回滚。",
+      "url": "https://github.com/microsoft/mssql-python/releases/tag/v1.12.0",
+      "tags": [
+        "Python",
+        "SQL Server",
+        "依赖管理",
+        "批量写入"
+      ]
+    },
+    {
+      "category": "LLM 应用运营",
+      "sourceType": "website",
+      "source": "Open Chat Studio",
+      "publishedAt": "2026-07-24",
+      "readTime": "3 min",
+      "title": "Open Chat Studio 同步修补用量归因、Schema 校验与文档竞态",
+      "summary": "Open Chat Studio 为 Usage API 增加按参与者、聊天机器人与平台分组和筛选，并通过游标分页返回结果。结构化抽取配置会在保存时拒绝 Anthropic 不支持的 Schema key，避免把错误推迟到服务端执行。文档同步也改为同一数据源串行处理，并跳过并发重复请求。",
+      "why": "这三项更新分别把成本归因、配置错误和同步竞态前移到可观测、可验证的控制点，适合纳入 LLM 应用的上线门禁。",
+      "url": "https://docs.openchatstudio.com/changelog/",
+      "tags": [
+        "用量统计",
+        "Schema 校验",
+        "并发控制",
+        "文档同步"
+      ]
+    },
+    {
+      "category": "安全数据集",
+      "sourceType": "huggingface",
+      "source": "League Labs",
+      "publishedAt": "2026-07-24",
+      "readTime": "10 min",
+      "title": "Synth Health Guardrails 用可追溯合成数据构建医疗 AI 输入安全集",
+      "summary": "该数据集用合成人设与上下文保留生成谱系，经词法和语义去重、选择性重写，再由两个模型独立盲审类别、严重度与路由。19,478 条候选中有 13,713 条获得三项完全一致的裁决，占 70.4%；其中 9,176 条共识标签不同于生成目标，四个固定切分还包含 1,096 条红队样本。作者明确说明这些标签来自模型共识，不是人工或临床真值，数据也不包含真实 PHI。",
+      "why": "它提供了从生成意图到最终裁决的可审计链路和不可变切分，适合作为安全数据流水线设计样本；模型共识偏差则必须独立验证。",
+      "url": "https://huggingface.co/blog/LeagueLabs/synth-health-guardrails-provenance-preserving-safe",
+      "tags": [
+        "合成数据",
+        "来源追踪",
+        "模型裁决",
+        "红队测试"
+      ]
+    },
     {
       "category": "产物治理",
       "sourceType": "website",
