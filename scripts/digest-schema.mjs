@@ -20,6 +20,8 @@ export const DIGEST_SOURCE_TYPES = [
 export const CONTENT_DATE_PRECISIONS = ["day", "month", "year"];
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const HAN_CHARACTER_PATTERN = /\p{Script=Han}/u;
+const LATIN_CHARACTER_PATTERN = /\p{Script=Latin}/u;
 
 function isPlainObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -66,8 +68,18 @@ export function validateStory(item, options = {}) {
   if (!hasText(item.source, 2, 120)) errors.push(`${path}.source 长度不合法`);
   if (!hasText(item.readTime, 1, 30)) errors.push(`${path}.readTime 长度不合法`);
   if (!hasText(item.title, 8, 180)) errors.push(`${path}.title 长度不合法`);
-  if (item.sourceType === "arxiv" && !hasText(item.subtitle, 4, 180)) {
-    errors.push(`${path}.subtitle 是 arXiv 论文必填的中文副标题，长度须为 4–180 个字符`);
+  if (item.sourceType === "arxiv") {
+    if (
+      hasText(item.title, 8, 180) &&
+      (!LATIN_CHARACTER_PATTERN.test(item.title) || HAN_CHARACTER_PATTERN.test(item.title))
+    ) {
+      errors.push(`${path}.title 必须保留 arXiv 的英文原题`);
+    }
+    if (!hasText(item.subtitle, 4, 180)) {
+      errors.push(`${path}.subtitle 是 arXiv 论文必填的中文副标题，长度须为 4–180 个字符`);
+    } else if (!HAN_CHARACTER_PATTERN.test(item.subtitle)) {
+      errors.push(`${path}.subtitle 必须是 arXiv 论文的中文副标题`);
+    }
   } else if (item.subtitle !== undefined && !hasText(item.subtitle, 4, 180)) {
     errors.push(`${path}.subtitle 长度不合法`);
   }

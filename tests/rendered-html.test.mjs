@@ -71,10 +71,10 @@ test("renders only the latest issue and its daily summary at /today", async () =
   assert.match(html, /当日总结/);
   assert.match(html, new RegExp(escapeRegExp(latestDigest.overview)));
   assert.match(html, new RegExp(escapeRegExp(latestDigest.items[0].title)));
-  const arxivPaper = latestDigest.items.find((item) => item.sourceType === "arxiv");
-  assert.ok(arxivPaper?.subtitle);
-  assert.match(html, new RegExp(escapeRegExp(arxivPaper.title)));
-  assert.match(html, new RegExp(escapeRegExp(arxivPaper.subtitle)));
+  for (const arxivPaper of latestDigest.items.filter((item) => item.sourceType === "arxiv")) {
+    assert.match(html, new RegExp(escapeRegExp(arxivPaper.title)));
+    assert.match(html, new RegExp(escapeRegExp(arxivPaper.subtitle)));
+  }
   assert.equal((html.match(/<article\b/g) ?? []).length, latestDigest.items.length);
   assert.doesNotMatch(html, /搜索标题、来源或标签|标签筛选/);
 });
@@ -89,6 +89,11 @@ test("renders only papers and preprints at /paper", async () => {
   assert.match(html, /搜索标题、来源或标签/);
   assert.match(html, new RegExp(escapeRegExp(paperStories[0].title)));
   assert.equal((html.match(/<article\b/g) ?? []).length, paperStories.length);
+
+  const arxivPaper = paperStories.find((item) => item.sourceType === "arxiv");
+  assert.ok(arxivPaper?.subtitle);
+  assert.match(html, new RegExp(escapeRegExp(arxivPaper.title)));
+  assert.match(html, new RegExp(escapeRegExp(arxivPaper.subtitle)));
 
   const renderedSourceTypes = [...html.matchAll(/data-source-type="([^"]+)"/g)]
     .map((match) => match[1]);

@@ -48,3 +48,13 @@ test("requires a Chinese editorial subtitle for arXiv papers", () => {
   delete digest.items[0].subtitle;
   assert.match(validateDigest(digest).join("\n"), /arXiv.*subtitle|subtitle.*arXiv/);
 });
+
+test("requires arXiv papers to keep an English title and Chinese subtitle", () => {
+  const translatedTitle = createDigest();
+  translatedTitle.items[0].title = "用执行轨迹改进长任务中的故障恢复能力";
+  assert.match(validateDigest(translatedTitle).join("\n"), /arXiv 的英文原题/);
+
+  const englishSubtitle = createDigest();
+  englishSubtitle.items[0].subtitle = "Improving failure recovery with execution traces";
+  assert.match(validateDigest(englishSubtitle).join("\n"), /中文副标题/);
+});
