@@ -1,13 +1,115 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-27T05:00:09.073Z",
-  "latestDigestDate": "2026-07-25",
-  "total": 76,
+  "generatedAt": "2026-07-27T05:39:20.000Z",
+  "latestDigestDate": "2026-07-26",
+  "total": 82,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-25"
+    "to": "2026-07-26"
   },
   "items": [
+    {
+      "category": "推理部署",
+      "sourceType": "huggingface",
+      "source": "0xSero",
+      "publishedAt": "2026-07-26",
+      "readTime": "12 min",
+      "title": "四张 96 GB GPU 跑起 753B 视觉模型，难点在可验证构建",
+      "summary": "作者保留每层全部 256 个专家，用 NVFP4、NF3 与 MXFP8 分层压缩把文本模型控制在约 341 GB，再接入约 0.93 GB 的 MoonViT 视觉塔，部署到四张 96 GB GPU。构建流程对 8 个下载文件做 SHA-256 校验，硬链接 184 个文本分片，并通过原子重命名发布完整检查点。服务配置测得 509,467-token KV cache、250,000-token 请求下 2.04 倍并发，以及 PCIe 机器上约 24–37 token/s；但视觉验证仅到 smoke test，MTP 因接受 token 为零而关闭。",
+      "why": "这份记录把超大模型复现拆成精度布局、供应链完整性、显存容量和实际吞吐四个可验收环节，也明确标出尚未完成的视觉基准。",
+      "url": "https://huggingface.co/blog/0xSero/glm52-vision-on-4-gpus",
+      "tags": [
+        "MoE",
+        "量化",
+        "长上下文",
+        "显存优化"
+      ]
+    },
+    {
+      "category": "生产可靠性",
+      "sourceType": "huggingface",
+      "source": "Fred Taylor",
+      "publishedAt": "2026-07-26",
+      "readTime": "10 min",
+      "title": "一台 M3 Pro 月产 428 条视频，19 次漏发暴露静默失败链",
+      "summary": "作者在 18 GB M3 Pro 上组合 MLX 图像生成、Kokoro TTS、Depth Anything、ffmpeg、launchd 与平台 API，一个月生成并发布 428 条短视频。实际故障并非模型崩溃，而是未检查子进程退出码、watchdog 文件名漂移，以及告警条件漏掉已检测异常，最终在 7 天内丢失 19 次发布。对照测量中，本地单图约 2 分 5 秒、ZeroGPU 约 12 秒；调整优先级令每日生成快约 10 倍，预渲染有限帧库则把单视频约 12 分钟的图像生成降为零。",
+      "why": "自治内容系统需要把退出码、状态对账和告警覆盖当作主流程，而不是事后补充；这组故障链可直接转成端到端验收用例。",
+      "url": "https://huggingface.co/blog/TheGringofred/makervox",
+      "tags": [
+        "MLX",
+        "故障恢复",
+        "可观测性",
+        "内容工作流"
+      ]
+    },
+    {
+      "category": "Agent 兼容性",
+      "sourceType": "github",
+      "source": "EvoScientist",
+      "publishedAt": "2026-07-26",
+      "readTime": "6 min",
+      "title": "EvoScientist 0.2.4 修补强制 thinking 与跨 provider 历史回放",
+      "summary": "v0.2.4 针对 Anthropic 兼容通道的严格校验：Kimi K3 的结构化输出改走 output_config.format/json_schema，避免强制 thinking 与指定工具调用冲突。跨 provider 切换时会剥离外来 reasoning_content，多轮回放保留 K3 thinking block，并为缺失的流式签名补默认值；版本还修复中断工具调用历史，并给 Codex proxy 默认 reasoning.context。依赖侧把 OpenRouter 固定在 0.11 以下，因为 0.11.x 出现 SSE 清理噪声与中途 ReadTimeout 回归。",
+      "why": "多模型 Agent 的协议兼容不能只比较字段名，还要覆盖思考状态、历史重放和流式边界；这些修复适合作为 provider 切换回归集。",
+      "url": "https://github.com/EvoScientist/EvoScientist/releases/tag/v0.2.4",
+      "tags": [
+        "工具调用",
+        "上下文管理",
+        "依赖管理",
+        "回归测试"
+      ]
+    },
+    {
+      "category": "MCP 互操作",
+      "sourceType": "github",
+      "source": "golembot",
+      "publishedAt": "2026-07-26",
+      "readTime": "3 min",
+      "title": "golembot 0.48.3 用正确 schema 与 stdin 修复 OpenCode 接入",
+      "summary": "golembot v0.48.3 修复两处 OpenCode 互操作问题：生成符合要求的 MCP 配置 schema，并通过 stdin 传入提示，而不是依赖错误的传递路径。正式 Release 在 Asia/Shanghai 12:43 发布，对应提交 5c4c60a，并关闭 issue 42 与 43。它没有性能基准，但把配置结构、进程 I/O 与具体故障单绑定在一个可复核补丁中。",
+      "why": "CLI 与 Agent 工具链的接入失败常发生在 schema 和标准输入边界；这个小版本提供了足够精确的回归目标。",
+      "url": "https://github.com/0xranx/golembot/releases/tag/v0.48.3",
+      "tags": [
+        "MCP",
+        "Schema 校验",
+        "OpenCode",
+        "工具调用"
+      ]
+    },
+    {
+      "category": "工程 Agent",
+      "sourceType": "website",
+      "source": "NVIDIA",
+      "publishedAt": "2026-07-26",
+      "readTime": "7 min",
+      "title": "NVIDIA 把 PhysicsNeMo 与 CUDA-X 重构成 Agent 可调用的工程技能",
+      "summary": "NVIDIA 扩展 Agent Toolkit，把 PhysicsNeMo 重构为面向 Agent 的库，并将 CUDA-X 加速求解器与量子化学能力封装为可调用技能；ACE-RTL 则配合 Nemotron 3 Ultra 处理 Verilog 设计任务。官方与合作伙伴报告的案例包括 Siemens 库表征超过 10 倍加速、Cadence 与 Samsung 最高 20 倍，以及 Silvaco 在 32 张 GPU 上不到 4 小时完成 32 亿网格节点仿真。页面同时说明多项产品仍处于不同发布阶段，性能数字应视为厂商报告而非独立基准。",
+      "why": "工程 Agent 的价值不在聊天层，而在能否受控调用成熟求解器并由领域工具复核；该发布给出了一组具体的 skill 化接口和规模边界。",
+      "url": "https://nvidianews.nvidia.com/news/nvidia-expands-nvidia-agent-toolkit-with-nvidia-physicsnemo-and-cuda-x-libraries-to-transform-how-the-world-engineers-designs-and-builds",
+      "tags": [
+        "工具调用",
+        "物理仿真",
+        "CUDA-X",
+        "开放模型"
+      ]
+    },
+    {
+      "category": "EDA 验证",
+      "sourceType": "website",
+      "source": "Siemens",
+      "publishedAt": "2026-07-26",
+      "readTime": "6 min",
+      "title": "Siemens 用确定性物理引擎给 EDA Agent 做逐步自校验",
+      "summary": "Siemens 发布 Fuse EDA AI Agent：每次生成式决策都回到确定性、基于物理的 EDA 引擎验证，并用 NeMo Gym、OpenShell、Nemotron 与 CUDA-X 组织受治理运行时、审计轨迹和多 Agent 协作。官方报告 Solido 表征流程周转时间降低超过 10 倍，token 成本降低 5–10 倍，同时指出验证可占芯片设计时间的 70%。这些能力面向后续产品版本，指标仍是厂商报告，尚不能视作独立横向评测。",
+      "why": "它给高风险 Agent 一个清晰架构：生成负责搜索，确定性工具负责接受或拒绝，并把每次判定留在可审计轨迹中。",
+      "url": "https://news.siemens.com/en-us/siemens-nvidia-dac-2026/",
+      "tags": [
+        "输出验证",
+        "审计日志",
+        "多 Agent",
+        "EDA"
+      ]
+    },
     {
       "category": "长上下文诊断",
       "sourceType": "huggingface",
