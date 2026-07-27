@@ -251,13 +251,29 @@ export function validateResearchArtifacts(artifacts, options = {}) {
   if (!Array.isArray(checks?.commands)) errors.push("checks.commands 必须是数组");
   if (complete) {
     const successfulCommands = (checks.commands ?? []).filter((item) => item.exitCode === 0);
-    const requiredCommands =
-      manifest.runType === "historical-backfill"
-        ? ["catalog:build", "npm test"]
-        : ["digest:validate", "digest:publish", "npm test"];
-    for (const required of requiredCommands) {
-      if (!successfulCommands.some((item) => item.command?.includes(required))) {
-        errors.push(`checks.commands 缺少成功记录: ${required}`);
+    if (manifest.runType === "historical-backfill") {
+      for (const required of ["catalog:build", "npm test"]) {
+        if (!successfulCommands.some((item) => item.command?.includes(required))) {
+          errors.push(`checks.commands 缺少成功记录: ${required}`);
+        }
+      }
+    } else {
+      if (!successfulCommands.some((item) => item.command?.includes("digest:validate"))) {
+        errors.push("checks.commands 缺少成功记录: digest:validate");
+      }
+      const transactionSucceeded = successfulCommands.some((item) =>
+        item.command?.includes("digest:transaction")
+      );
+      if (transactionSucceeded) {
+        if (!successfulCommands.some((item) => item.command?.includes("digest:finalize"))) {
+          errors.push("checks.commands 缺少成功记录: digest:finalize");
+        }
+      } else {
+        for (const required of ["digest:publish", "npm test"]) {
+          if (!successfulCommands.some((item) => item.command?.includes(required))) {
+            errors.push(`checks.commands 缺少成功记录: ${required}`);
+          }
+        }
       }
     }
     if (!checks.git?.pushed || !hasText(checks.git?.commitSha)) {

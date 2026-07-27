@@ -132,6 +132,19 @@ test("accepts a complete, traceable research run", () => {
   assert.deepEqual(validateResearchArtifacts(completeRun(), { complete: true }), []);
 });
 
+test("accepts the transactional publish command as publish plus test evidence", () => {
+  const run = completeRun();
+  run.checks.commands = [
+    { command: "npm run digest:validate -- content/inbox/2026-07-21.json", exitCode: 0 },
+    {
+      command: "npm run digest:transaction -- content/inbox/2026-07-21.json /tmp/run",
+      exitCode: 0,
+    },
+    { command: "npm run digest:finalize -- /tmp/run abcdef1", exitCode: 0 },
+  ];
+  assert.deepEqual(validateResearchArtifacts(run, { complete: true }), []);
+});
+
 test("requires every candidate to have a final disposition", () => {
   const run = completeRun();
   run.selection.selectedIds = [];

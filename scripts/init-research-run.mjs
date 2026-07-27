@@ -50,6 +50,7 @@ while (true) {
 }
 
 await mkdir(resolve(runDirectory, "retrievals"), { recursive: true });
+await mkdir(resolve(runDirectory, "query-entries"), { recursive: true });
 const common = { schemaVersion: 1, targetDate };
 const manifest = {
   schemaVersion: 1,

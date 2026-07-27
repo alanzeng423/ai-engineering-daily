@@ -15,8 +15,12 @@
     "digest:check": "node scripts/check-content.mjs",
     "digest:validate": "node scripts/validate-digest.mjs",
     "digest:publish": "node scripts/publish-digest.mjs",
+    "digest:transaction": "node scripts/publish-transaction.mjs",
+    "digest:recover": "node scripts/recover-publication.mjs",
+    "digest:finalize": "node scripts/finalize-publication.mjs",
     "catalog:build": "node scripts/rebuild-catalog.mjs",
     "research:init": "node scripts/init-research-run.mjs",
+    "research:query": "node scripts/append-research-query.mjs",
     "research:validate": "node scripts/validate-research-run.mjs"
   },
   "dependencies": {

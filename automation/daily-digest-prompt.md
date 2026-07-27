@@ -1,18 +1,25 @@
-每天 09:30（Asia/Shanghai）生成并发布“昨日 AI 与软件工程精选”。目标读者是有技术背景的 AI、Agent 与软件工程从业者；只收录能影响研究判断、工程实践或工具选择的一手信息。本任务只有在完整研究过程成功落盘、日报 JSON 成功推送到 GitHub，并确认 Cloudflare 自动部署和正式域名内容后才算完成；不要只在任务对话中输出摘要。
+每天 09:30（Asia/Shanghai）生成并发布“昨日 AI 与软件工程精选”，并自动补偿尚未发布的最近缺期。目标读者是有技术背景的 AI、Agent 与软件工程从业者；只收录能影响研究判断、工程实践或工具选择的一手信息。本任务只有在完整研究过程成功落盘、日报 JSON 成功推送到 GitHub，并确认 Cloudflare 自动部署和正式域名内容后才算完成；不要只在任务对话中输出摘要。
+
+【缺期补偿与有限重试：强制】
+1. 以上海时区的前一自然日为 LATEST_ALLOWED_DATE。读取 content/index.json，从最新已归档日期的下一天到 LATEST_ALLOWED_DATE 建立缺期列表；按日期升序处理，单次任务最多处理 2 个日期。若没有缺期，确认工作区和 origin/main 一致后简短报告“无需更新”并结束，不重复生成已有日期。
+2. 同一目标日期必须完整成功后才能进入下一日期；不得跳过失败日期。下一次 09:30 仍从最早缺期开始，因此进程级中断也能自动补偿。
+3. 搜索、Feed/API、原文访问、git fetch/pull/push 等瞬时网络失败最多尝试 3 次，间隔 15、30、60 秒；每次尝试都单独写 retrieval、checks 和 events，禁止覆盖失败记录。HTTP 4xx、日期不合格、正文不可读、JSON/schema/test 失败属于确定性失败，不盲目重试。
+4. Cloudflare Check 和正式域名属于异步传播：每 20 秒检查一次，最多等待 10 分钟。可以用带提交 SHA 的 cache-busting URL 辅助诊断，但最终必须由不带查询参数的正式 URL 通过验证。
+5. 单个请求重试耗尽后，将当前 run 完整标记 failed。只有明确属于瞬时基础设施故障、尚未创建 Git 提交且工作区已自动恢复干净时，才允许为同一目标日期新建 1 个 run-id 重试整期；每个目标日期每次定时任务最多 2 个 run。内容、schema 或测试失败不得用重复生成掩盖。
 
 【目标日期与运行档案初始化】
 1. 工作目录固定为 /Users/alanzeng/Documents/schedule-daily。
-2. 目标日期是 Asia/Shanghai 时区的前一自然日，格式 YYYY-MM-DD。
-3. 在任何检索或 Git 操作前运行 `npm run research:init -- YYYY-MM-DD`。保存命令输出的绝对路径为本次 RUN_DIRECTORY，后续所有记录只能写入该目录。即使同一天重跑，也必须创建新的 run-id，禁止复用、覆盖或删除以往运行目录。
+2. 目标日期是本次缺期列表中当前最早的日期，格式 YYYY-MM-DD；以下流程在最多 2 个目标日期上逐日完整执行。
+3. 在该日期的任何检索或 Git 操作前运行 `npm run research:init -- YYYY-MM-DD`。保存命令输出的绝对路径为本次 RUN_DIRECTORY，后续所有记录只能写入该目录。即使同一天重跑，也必须创建新的 run-id，禁止复用、覆盖或删除以往运行目录。
 4. 立即在 manifest.json 写入当前 Git HEAD 为 baseCommit，并在 events.ndjson 追加初始化事件。每次阶段切换、异常、重试、发布和验证都追加一条带 ISO 时间的事件。
-5. 运行 `git status --porcelain`。`research/` 与 `content/inbox/` 已被 Git 忽略，不影响干净状态判断。若存在其他未提交或未跟踪的用户改动，更新 manifest.json：status=failed、finishedAt、failure.stage=preflight、failure.message，并追加失败事件后停止；不得覆盖、暂存或清理。
-6. 工作区干净时运行 `git pull --ff-only origin main`；失败或无法 fast-forward 时同样记录失败产物后停止。
+5. 运行 `git status --porcelain`。`research/` 与 `content/inbox/` 已被 Git 忽略，不影响干净状态判断。若公开内容文件有遗留改动，先运行 `npm run digest:recover -- RUN_DIRECTORY`，把命令与结果写入 checks/events，再重新检查状态。该命令只会在文件哈希能证明属于旧发布事务时恢复；若没有可恢复事务、出现事务外改动或恢复后仍不干净，按 preflight 失败停止，禁止覆盖、暂存或清理用户改动。
+6. 工作区干净后以最多 3 次瞬时网络重试执行 `git fetch origin main` 和 `git pull --ff-only origin main`。若本地 HEAD 领先 origin/main，只能在逐提交证明提交信息为自动日报、diff 仅含该期 4 个公开文件时重试推送并补做部署验证；不能证明自动化所有权时停止，不改写历史。
 
 【全量研究产物归档：强制】
 1. 所有中间产物必须写入 RUN_DIRECTORY；不允许只留在任务对话、模型上下文或工具调用历史中。研究目录只保存在本机且被 Git 忽略，不得提交到公开仓库或部署到网站。
 2. 每次搜索、Feed/API 请求、GitHub/Hugging Face 查询、社交平台查询和打开原文，完成后必须先创建一个新的不可变文件 `retrievals/NNNN-kind.json`，再进行下一批操作。NNNN 从 0001 递增，文件一旦写入不得修改、复用编号或删除。
 3. 每个 retrieval 文件必须包含：schemaVersion=1、targetDate、batchId、kind、requestedAt、completedAt、完整 request 参数、response 状态，以及本次返回的全部结构化结果。搜索结果逐条保存排名、标题、URL、作者或机构、平台、可见日期和摘要片段；打开原文时保存最终 URL、访问状态、页面标题、作者、原始日期文本、定位信息、用于判断的短证据摘录和错误信息。不要整页复制受版权保护的正文。
-4. 每执行一个检索式，立即把检索式、语言、范围、执行时间和关联 retrievalIds 追加到 queries.json。不得在运行结束时仅凭记忆重建。
+4. 每执行一个检索式，先用 apply_patch 创建新的不可变条目 `RUN_DIRECTORY/query-entries/NNNN.json`，包含 id、query、language、scope、executedAt 和 retrievalIds；随后运行 `npm run research:query -- RUN_DIRECTORY 条目文件` 原子追加。禁止直接编辑 queries.json。条目语法或引用失败时保留失败条目，使用新编号写修正版；不得覆盖，也不得在运行结束时凭记忆重建。
 5. candidates.json 保存完整规范化候选池，包括最终重复项和被淘汰项。每个候选必须有稳定 id、原始及规范 URL、标题、作者/机构、sourceType、queryIds、retrievalIds、duplicateOf 和当前状态；原始未去重结果由 retrieval 文件永久保留。
 6. verification.json 为每个候选保存核验记录：访问结果、最终 URL、标题、作者/机构、首次公开时间原文、时区依据、换算后的 Asia/Shanghai 日期、日期是否合格、正文是否可读、问题、方法/实现、关键结果、与既有内容的区别、证据及定位、拒绝原因。重复或无法访问的候选也必须有记录。
 7. scores.json 为每个候选保存五项分数、总分、是否过线和理由；确实无法评分时 total=null，并记录 notScoredReason，不得省略该候选。
@@ -62,22 +69,22 @@
 将 manifest.stage 更新为 validation，每个命令执行后立即把命令、时间、退出码和输出写入 checks.json：
 1. `npm run research:validate -- RUN_DIRECTORY`
 2. `npm run digest:validate -- content/inbox/YYYY-MM-DD.json`
-3. `npm run digest:publish -- content/inbox/YYYY-MM-DD.json`
-4. `npm test`
-任一步失败立即停止，不提交、不推送，并按全量归档规则记录失败。
+3. `npm run digest:transaction -- content/inbox/YYYY-MM-DD.json RUN_DIRECTORY`
+第 3 条会先计算 4 个公开文件的确定性结果和 SHA-256、把原内容备份到 RUN_DIRECTORY，再原子写入并在事务内执行完整 `npm test`。任一步失败会只恢复该事务拥有的 4 个文件；确认 `git status --porcelain` 回到事务前状态后再按失败流程停止。若自动回滚无法证明文件所有权，禁止强行清理并明确报告 recovery_required。
 
 【Git 发布】
 1. 将 manifest.stage 更新为 publishing，运行 `git status --porcelain` 并记录结果。
 2. 只允许 content/index.json、content/latest.json、content/catalog.json、content/digests/YYYY-MM-DD.json 四个文件发生变化；research/ 与 content/inbox/ 必须保持 Git 忽略。content/catalog.json 由发布脚本从基底库和所有日报归档确定性生成，不得手工编辑。发现其他变化时记录失败并停止，不得暂存或覆盖。
 3. 仅暂存上述四个文件。若与仓库现有版本完全相同，不创建空提交；在 checks.json 记录“本期无变化”，继续核对正式站点已有内容。
 4. 提交信息固定为：Publish daily digest YYYY-MM-DD。
-5. 推送到 origin main；失败时停止并记录，不 force push，不改写历史。将 commitSha、remote、branch 和 pushed 写入 checks.json。
+5. 推送到 origin main；瞬时网络错误按 15、30、60 秒最多尝试 3 次，每次都记录。不得 force push、不得改写历史。将 commitSha、remote、branch、每次 push attempt 和 pushed 写入 checks.json。
+6. 推送成功后运行 `npm run digest:finalize -- RUN_DIRECTORY COMMIT_SHA`，将发布事务绑定到已推送提交并记录命令；失败时不得声称事务完成。
 
 【部署验证与运行收尾】
-1. 将 manifest.stage 更新为 deployment。推送后取得新提交 SHA，等待该提交的 GitHub Check“Workers Builds: ai-engineering-daily”完成，并将状态及详情链接写入 checks.json。
-2. Check 成功后访问 https://ai.alanzeng.com，确认 HTTP 200、页面包含本期日期和至少一条本期标题，并且渲染出的 article 数量与 content/catalog.json 的 total 一致。再访问 https://ai.alanzeng.com/today，确认 HTTP 200、页面包含本期 overview 与至少一条本期标题，并且渲染出的 article 数量与 content/latest.json 的 items 数量一致；记录两个页面的验证时间、HTTP 状态和结果。workers.dev 地址只可作为故障诊断备用地址。
+1. 将 manifest.stage 更新为 deployment。推送后取得新提交 SHA，按“缺期补偿与有限重试”中的轮询策略等待该提交的 GitHub Check“Workers Builds: ai-engineering-daily”完成，并将每次状态、结论及详情链接写入 checks.json。
+2. Check 成功后轮询访问 https://ai.alanzeng.com，确认 HTTP 200、页面包含本期日期和至少一条本期标题，并且渲染出的 article 数量与 content/catalog.json 的 total 一致。再访问 https://ai.alanzeng.com/today，确认 HTTP 200、页面包含本期 overview 与至少一条本期标题，并且渲染出的 article 数量与 content/latest.json 的 items 数量一致；每次尝试均记录验证时间、HTTP 状态、观察值和是否命中旧缓存。workers.dev 和 cache-busting 地址只可作为故障诊断，不能替代正式 URL 的最终成功。
 3. Check 失败、合理等待后仍未完成或正式域名不匹配时，按失败流程收尾，不得声称已上线。
 4. 全部成功后更新 manifest：status=completed、stage=completed、finishedAt、最终 counts，追加完成事件，然后运行 `npm run research:validate -- RUN_DIRECTORY --complete`。若完整性校验失败，改记 failed 并报告，不得隐瞒缺失的中间产物。
 
 【最终报告】
-用中文简短报告：目标日期、RUN_DIRECTORY、检索批次数、原始发现数、规范候选数、完成核验数、最终条目数、来源与论文占比、研究产物完整性校验、内容校验和测试结果、Git 提交 SHA、推送结果、Cloudflare 构建结果、正式域名验证结果及网站链接。不要重复整份日报，不输出趋势观察。
+用中文简短报告：本次缺期列表、逐日期的 RUN_DIRECTORY 与 run attempt、检索批次数、原始发现数、规范候选数、完成核验数、最终条目数、来源与论文占比、研究产物完整性校验、事务测试与回滚状态、Git 提交 SHA、推送尝试、Cloudflare 构建与正式域名验证尝试及网站链接。不要重复整份日报，不输出趋势观察。
