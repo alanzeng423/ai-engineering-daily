@@ -1,13 +1,221 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-23T01:46:00.000Z",
-  "latestDigestDate": "2026-07-22",
-  "total": 48,
+  "generatedAt": "2026-07-27T03:59:00.000Z",
+  "latestDigestDate": "2026-07-23",
+  "total": 60,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-22"
+    "to": "2026-07-23"
   },
   "items": [
+    {
+      "category": "产物治理",
+      "sourceType": "website",
+      "source": "OpenAI Academy",
+      "publishedAt": "2026-07-23",
+      "readTime": "5 min",
+      "title": "把 Codex 生成演示稿变成有来源层级和对账记录的受控构建",
+      "summary": "OpenAI Academy 给出一套从业务更新生成评审就绪演示稿的 Codex 流程：先限定获准来源和优先级，再提交编辑计划并等待审批，生成后输出对账记录与来源映射。最终仍由人工核验内容和版式，使产物与输入证据之间保留可追踪关系。",
+      "why": "这套流程适合迁移到报告、提案和发布说明等高审查成本产物，把来源约束、计划审批和结果对账固化为流水线步骤。",
+      "url": "https://academy.openai.com/en/public/clubs/champions-ecqup/resources/turn-updates-into-review-ready-leadership-decks-2026-07-23",
+      "tags": [
+        "Codex",
+        "来源追踪",
+        "人工审核",
+        "内容工作流"
+      ]
+    },
+    {
+      "category": "任务编排",
+      "sourceType": "blog",
+      "source": "Databricks、CLA",
+      "publishedAt": "2026-07-23",
+      "readTime": "7 min",
+      "title": "用两张 Postgres 表承载 Agent 队列、租约与成本归因",
+      "summary": "Databricks 与 CLA 用 Lakebase Postgres 编排长时文档提取 Agent：任务表通过 FOR UPDATE SKIP LOCKED 按优先级领取工作，租约支持故障恢复，另以 token 和并发额度节流外部模型。回调采用幂等写入，进度以 SSE 推送并回退到轮询，同时逐请求记录模型成本；生产提取时间从数小时缩短到数分钟。",
+      "why": "该方案展示了如何用事务数据库同时承担持久状态与调度控制，适合不想额外引入消息队列、但需要恢复、限流和审计的 Agent 工作负载。",
+      "url": "https://www.databricks.com/blog/simplify-ai-agent-orchestration-lakebase-postgres",
+      "tags": [
+        "Postgres",
+        "任务队列",
+        "故障恢复",
+        "成本归因"
+      ]
+    },
+    {
+      "category": "运行可靠性",
+      "sourceType": "website",
+      "source": "Agent Zero",
+      "publishedAt": "2026-07-23",
+      "readTime": "4 min",
+      "title": "Agent Zero 2.6 修补长会话压缩与后台任务生命周期",
+      "summary": "Agent Zero v2.6 加入可恢复且避免泄露秘密的上下文压缩，并修复 shell 与后台任务在重连、停止和恢复过程中的生命周期问题。版本还集中处理浏览器、连接器稳定性与响应修复，覆盖长会话常见的状态损坏路径。",
+      "why": "它把 Agent 可靠性拆成压缩、进程、任务、浏览器和连接器等可检查层，适合用于开源 Agent 运行时的故障清单与回归测试。",
+      "url": "https://www.agent-zero.ai/p/docs/changelog/",
+      "tags": [
+        "Agent Zero",
+        "上下文压缩",
+        "任务生命周期",
+        "故障恢复"
+      ]
+    },
+    {
+      "category": "边缘缓存",
+      "sourceType": "blog",
+      "source": "Cloudflare",
+      "publishedAt": "2026-07-23",
+      "readTime": "6 min",
+      "title": "Cloudflare 把缓存规则移到看见源站响应之后",
+      "summary": "Cache Response Rules 在源站响应返回后、写入缓存前执行，因此规则可以依据响应状态处理缓存，而不只依赖请求。它能移除 Set-Cookie、ETag、Last-Modified，重写 Cache-Control 并管理缓存标签；若与请求阶段规则冲突，响应规则优先，原文也列出会改变缓存或校验行为的边界条件。",
+      "why": "这让缓存决策可以利用真实响应信息，但也把验证器、Cookie 和标签一致性带进配置审查，适合纳入边缘发布的回归检查。",
+      "url": "https://blog.cloudflare.com/introducing-cache-response-rules/",
+      "tags": [
+        "Cloudflare",
+        "缓存策略",
+        "响应头",
+        "边缘计算"
+      ]
+    },
+    {
+      "category": "分析 Agent",
+      "sourceType": "website",
+      "source": "Databricks",
+      "publishedAt": "2026-07-23",
+      "readTime": "4 min",
+      "title": "Databricks 扩展 Genie Agent API、受治理文件分析与仪表盘生成",
+      "summary": "Databricks 为 Genie Agents 增加 beta API 与 Unity Catalog volume 分析，把单个 PDF 页数上限从 4,000 提升到 15,000。Genie Code 的仪表盘创作进入 GA，并保留可撤销的重新设计路径。",
+      "why": "这些变化把分析 Agent 从交互界面扩展到可编程调用、受治理文件和可回滚产物，直接影响企业分析流程的集成方式。",
+      "url": "https://docs.databricks.com/aws/en/ai-bi/release-notes/2026",
+      "tags": [
+        "Databricks",
+        "数据治理",
+        "文档分析",
+        "仪表盘"
+      ]
+    },
+    {
+      "category": "策略学习",
+      "sourceType": "arxiv",
+      "source": "Jaideep Ray、Ankit Goyal",
+      "publishedAt": "2026-07-23",
+      "readTime": "7 min",
+      "title": "From Agent Failures to Text Policies: What Works and What Breaks",
+      "subtitle": "Agent 会遵循好策略，不代表能从失败轨迹学出好策略",
+      "summary": "研究把文本策略的“能否执行”与“能否从经验学出”分开检验：人工编写的策略让两个冻结的 7B Agent 在 TextWorldExpress 上提高 5.0 个成功率点，证明有用策略确实存在。但从轨迹生成的策略即使加入更丰富的 trace、反事实证据或迭代 GEPA 搜索，也不能稳定优于固定提示。",
+      "why": "这项负结果把瓶颈定位到策略更新的生成与选择，而非模型遵循文本规则的能力，可避免把更多轨迹或更长反思误当作可靠学习机制。",
+      "url": "https://arxiv.org/abs/2607.20668",
+      "tags": [
+        "文本策略",
+        "执行轨迹",
+        "负结果",
+        "Agent 评测"
+      ]
+    },
+    {
+      "category": "自动化治理",
+      "sourceType": "blog",
+      "source": "GitHub",
+      "publishedAt": "2026-07-23",
+      "readTime": "4 min",
+      "title": "GitHub Issues 为 Agent 自动化加入置信度、理由与审批轨迹",
+      "summary": "GitHub Issues 的公开预览让自动化输出携带置信度和理由，并可按阈值把建议留在审批状态；API 暴露意图和安全输出，审计轨迹记录建议与决策。GitHub 同时明确，审批用于工作流便利，不应被当作安全边界。",
+      "why": "团队可以把不确定性与人工决策写入工作项数据，而不是只留在对话里；安全权限仍需由执行层独立约束。",
+      "url": "https://github.blog/changelog/2026-07-23-agent-automation-controls-in-github-issues-in-public-preview/",
+      "tags": [
+        "GitHub Issues",
+        "置信度",
+        "人工审批",
+        "审计日志"
+      ]
+    },
+    {
+      "category": "协议迁移",
+      "sourceType": "blog",
+      "source": "GitHub",
+      "publishedAt": "2026-07-23",
+      "readTime": "4 min",
+      "title": "GitHub MCP Server 迁入无状态协议核心",
+      "summary": "GitHub MCP Server 为下一版 MCP 规范移除服务端 session 与 Redis 会话访问，也不再在初始化阶段深度检查负载，使握手可以并行完成。实现同时升级 elicitation，并用官方 conformance tests 验证草案行为。",
+      "why": "这是一份具体的状态模型迁移样本：协议升级不仅是字段兼容，还会改变会话存储、初始化路径和一致性测试的责任边界。",
+      "url": "https://github.blog/changelog/2026-07-23-github-mcp-server-supports-the-next-mcp-specification/",
+      "tags": [
+        "MCP",
+        "无状态服务",
+        "一致性测试",
+        "GitHub"
+      ]
+    },
+    {
+      "category": "界面质量",
+      "sourceType": "arxiv",
+      "source": "Nishi Mehta 等",
+      "publishedAt": "2026-07-23",
+      "readTime": "8 min",
+      "title": "Learning to Detect UI Principle Violations via Reinforcement Learning",
+      "subtitle": "用强化学习把生成界面的可访问性与设计原则变成自动门禁",
+      "summary": "论文处理生成前端“能编译、能渲染、能过单测却仍违反界面原则”的缺口，将 WCAG 2.2、欺骗性设计与 HCI 原则归并为 19 类，并在干净页面中注入可验证违规，构造约一万个页面的数据集。对 4B 视觉语言模型继续强化学习后，micro-F1 从 36% 提升到 84%，19 项中有 13 项超过 80% F1。",
+      "why": "这提供了从功能测试扩展到界面质量审查的可复现实验路径，critic 还能用于过滤训练数据或为设计感知代码生成提供奖励。",
+      "url": "https://arxiv.org/abs/2607.20690",
+      "tags": [
+        "前端生成",
+        "强化学习",
+        "可访问性",
+        "质量门禁"
+      ]
+    },
+    {
+      "category": "协作审计",
+      "sourceType": "website",
+      "source": "Linear",
+      "publishedAt": "2026-07-23",
+      "readTime": "3 min",
+      "title": "Linear 将 Agent 编辑单独标注并保留可恢复检查点",
+      "summary": "Linear 会高亮 Agent 对 issue 文本的修改，并以作者标识区分自动添加内容，便于协作者逐项审查。版本检查点保留历史状态，可在自动编辑造成偏差时恢复。",
+      "why": "当 Agent 直接修改共享事实源时，归属、差异和回滚比“谁最后保存”更重要；这些界面原语可作为协作产品的最低审计要求。",
+      "url": "https://linear.app/changelog/2026-07-23-agent-assisted-editing",
+      "tags": [
+        "Linear",
+        "变更审查",
+        "版本恢复",
+        "内容归属"
+      ]
+    },
+    {
+      "category": "训练系统",
+      "sourceType": "arxiv",
+      "source": "Jian Hu 等",
+      "publishedAt": "2026-07-23",
+      "readTime": "10 min",
+      "title": "Molt: A Scalable PyTorch-Native Training Framework for Agentic Reinforcement Learning",
+      "subtitle": "Molt 用单一可读训练路径守住 Agentic RL 的一致性与规模",
+      "summary": "Molt 针对 Agentic RL 框架难以修改和审计的问题，把 Ray、vLLM 与 FSDP2 组织成一个 PyTorch 原生异步循环，并用 token 身份、策略版本语义和前向一致性三项不变量约束数据路径。其核心训练路径约 8.6K 行，在匹配异步协议下与 Megatron 系栈的性能统计可比；同一路径已从 4B 稠密模型运行到 700B MoE，并以 Apache-2.0 开源。",
+      "why": "它把研究迭代速度与训练正确性放在同一架构里，适合作为评估 Agentic RL 基础设施复杂度、可审计性和训练—推理一致性的参照。",
+      "url": "https://arxiv.org/abs/2607.21653",
+      "tags": [
+        "Agentic RL",
+        "PyTorch",
+        "异步训练",
+        "训练一致性"
+      ]
+    },
+    {
+      "category": "代码优化",
+      "sourceType": "arxiv",
+      "source": "Yuwei Zhao 等",
+      "publishedAt": "2026-07-23",
+      "readTime": "9 min",
+      "title": "Multi-Source and Cross-Scenario Strategy-Guided Code Optimization",
+      "subtitle": "MoST 从多源证据提炼可跨语言迁移的代码优化策略",
+      "summary": "MoST 将提交、文档等不同知识来源统一成证据对象，经自平衡加权聚类提炼优化策略，再把示例迁移到目标语言并生成静态分析规则，引导 LLM 定位和修改代码。在 151 个 C/C++、150 个 Python 和 50 个 Rust 历史任务上，相比 SemOpt，生成与开发者补丁完全相同的补丁数提高 24.44%–180.00%，语义等价补丁数提高 21.88%–37.50%；15 个真实项目的性能测试也取得更高改善。",
+      "why": "它把优化知识从单一提交历史扩展到多源、跨场景证据，并同时用补丁等价性和真实项目性能验证，适合指导代码优化 Agent 的知识库与规则生成设计。",
+      "url": "https://arxiv.org/abs/2607.20353",
+      "tags": [
+        "代码优化",
+        "静态分析",
+        "知识迁移",
+        "补丁生成"
+      ]
+    },
     {
       "category": "确定性门禁",
       "sourceType": "reddit",
