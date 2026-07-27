@@ -1,13 +1,134 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-27T04:34:02.000Z",
-  "latestDigestDate": "2026-07-24",
-  "total": 69,
+  "generatedAt": "2026-07-27T05:00:09.073Z",
+  "latestDigestDate": "2026-07-25",
+  "total": 76,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-24"
+    "to": "2026-07-25"
   },
   "items": [
+    {
+      "category": "长上下文诊断",
+      "sourceType": "huggingface",
+      "source": "David Davidich",
+      "publishedAt": "2026-07-25",
+      "readTime": "10 min",
+      "title": "百万 token 检索失败后，真正有用的是定位 18 个检索头",
+      "summary": "作者在真实散文中植入可控 needle，同时改变上下文长度与相似记录数：模型在 33,334 token 得到 92.9%，到约 100.5 万 token、14 条记录时只剩 21.4%。六种位置映射、注意力温度和 KV 精度等四类干预均未可靠修复；3-bit 与 fp8 的配对比较得到 McNemar p=0.34。进一步的 copy-paste 归因显示，384 个头中 18 个承载一半检索质量，约四分之三集中在一个 GQA KV 组，因而把下一步训练范围缩到七层中的小型适配器。",
+      "why": "这份记录把“支持百万上下文”拆成长度、干扰项和检索电路三个可测变量，并完整报告无效方案，可直接改进长上下文验收与消融设计。",
+      "url": "https://huggingface.co/blog/Ddavidich/dikun-international-news",
+      "tags": [
+        "长上下文",
+        "注意力归因",
+        "消融实验",
+        "显著性检验"
+      ]
+    },
+    {
+      "category": "Coding Agent 选型",
+      "sourceType": "blog",
+      "source": "Omid Saffari",
+      "publishedAt": "2026-07-25",
+      "readTime": "11 min",
+      "title": "九款开源 Coding Agent 的分水岭不是功能数，而是谁掌握权限",
+      "summary": "文章以监督界面、权限设计、模型与 provider 灵活性、部署边界及首个运营瓶颈五项标准，对 OpenCode、Cline、Aider、OpenHands、Gemini CLI、Continue、goose、mini-SWE-agent 和 Qwen Code 做一手文档核对。结论按工作方式拆分：IDE 审批、终端 Git 循环、无人队列和透明研究 harness 需要不同工具。作者还区分开源客户端、本地运行与本地模型，指出免费 harness 仍会产生模型账单，并给出隔离分支、最小凭据、只读计划和人工合并门禁。",
+      "why": "选型表如果不同时记录执行位置、许可边界、provider 数据路径和默认批准策略，很容易把“代码开源”误当成“可安全自治”。",
+      "url": "https://omidsaffari.com/blog/open-source-ai-coding-agents-guide",
+      "tags": [
+        "Coding Agent",
+        "开源工具",
+        "权限模型",
+        "部署边界"
+      ]
+    },
+    {
+      "category": "训练精度策略",
+      "sourceType": "huggingface",
+      "source": "Gerron Burford",
+      "publishedAt": "2026-07-25",
+      "readTime": "12 min",
+      "title": "同一训练引擎不该共用一种精度策略",
+      "summary": "作者在同一 Hopper 训练路径内固定模型族、注意力后端与对应工作阶段，重新比较 FP8 和 BF16 linears。结果不是统一赢家：Edge 与 Swift 使用 BF16 分别快约 6–8% 和 8–11%，AI 与 MoE 使用 FP8 则快约 9–11% 和 1–6%。复核还发现启动器把 Edge 错分到 AI 的 FP8 分支，使预期 BF16 路径成为死代码；修复后从请求策略、接受配置、实际运行到检查点证据逐级确认。",
+      "why": "精度是模型形状、内核和调度共同决定的运行策略；基准结论应绑定软件版本，并核对实际解析配置，而非只相信命令行或注释。",
+      "url": "https://huggingface.co/blog/KissTheHabit/four-bodies-four-precision-policies",
+      "tags": [
+        "FP8",
+        "BF16",
+        "训练吞吐",
+        "配置漂移"
+      ]
+    },
+    {
+      "category": "Agent 网关",
+      "sourceType": "github",
+      "source": "agentgateway",
+      "publishedAt": "2026-07-25",
+      "readTime": "6 min",
+      "title": "agentgateway 1.4 Beta 把 MCP 认证、模型护栏与遥测推进同一网关",
+      "summary": "v1.4.0-beta.1 汇集 48 项变更：OAuth 2.1 token exchange 增加默认值与自定义 token 类型，MCP 原生接入 Microsoft Entra ID，LLM webhook 护栏的 header 与 path 可由 CEL 配置。模型面新增 Vertex 上 Gemini 原生 generateContent/streamGenerateContent 端点，遥测记录 tool call 与 A2A 响应，JWKS 拉取改为有界并发。发布同时提供 Docker、Helm、agentgateway 与 agctl 二进制，并默认不再暴露 standalone 管理接口。",
+      "why": "它展示了生产 Agent 网关需要同时治理身份、模型协议、护栏、配置持久化和可观测性，适合作为平台能力清单与升级审查基线。",
+      "url": "https://github.com/agentgateway/agentgateway/releases/tag/v1.4.0-beta.1",
+      "tags": [
+        "MCP",
+        "OAuth 2.1",
+        "可观测性",
+        "策略控制"
+      ]
+    },
+    {
+      "category": "本地推理",
+      "sourceType": "github",
+      "source": "Ollama",
+      "publishedAt": "2026-07-25",
+      "readTime": "4 min",
+      "title": "Ollama 0.32.4 补齐 Laguna 的 MLX 路径并修复量化 MoE 解码",
+      "summary": "Ollama v0.32.4 让 Laguna 模型可通过 MLX 在 Apple GPU 上运行，并在创建 speculative decoding 草稿模型时按请求类型量化输出头。版本还修复不同 expert 使用不同量化方式时的 Qwen3 MoE 解码。官方 Release 报告，M5 Max 上 packed gate/up projection 的速度提升约 4–9%，并发布 17 个跨平台安装与运行产物。",
+      "why": "本地模型升级应同时验证硬件后端、草稿模型量化与混合 expert 解码；该版本给出了一组可直接复测的兼容性和性能变化。",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.32.4",
+      "tags": [
+        "MLX",
+        "推测解码",
+        "MoE",
+        "量化"
+      ]
+    },
+    {
+      "category": "Skills 评测",
+      "sourceType": "arxiv",
+      "source": "Darshan Tank、Baran Nama",
+      "publishedAt": "2026-07-25",
+      "readTime": "8 min",
+      "title": "The Regression Tax: Decomposing Why Skills Help and Hurt LLM Agents",
+      "subtitle": "近六千次运行揭示 Skills 的净增益如何掩盖回归",
+      "summary": "研究在两个办公自动化基准和三套模型—harness 组合上完成近 6,000 次运行，逐任务比较有无 Skills 的结果，把净变化拆成新增成功、回归和持续失败。表现最好的 Skills 主要不是带来更多新增成功，而是让已能完成的任务更少退化。轨迹分析归纳出描述渗透、grounding displacement 与 verification displacement 三种回归机制，并指出现有 Skills 过度强调流程步骤、低估输入落地和输出核验。",
+      "why": "Skills 上线不应只看平均成功率；配对回归率、未调用时的上下文干扰和验证覆盖应成为独立门禁。",
+      "url": "https://arxiv.org/abs/2607.22520",
+      "tags": [
+        "Agent Skills",
+        "回归测试",
+        "Grounding",
+        "输出验证"
+      ]
+    },
+    {
+      "category": "模型路由",
+      "sourceType": "arxiv",
+      "source": "Ritik Raj 等",
+      "publishedAt": "2026-07-25",
+      "readTime": "8 min",
+      "title": "TRACE-ROUTER: Task-Consistent and Adaptive Online Routing for Agentic AI",
+      "subtitle": "用任务级终局反馈替代逐调用路由",
+      "summary": "逐次 LLM 调用做路由无法把长时 Agent 的最终成败归因给某次选择，TRACE-Router 因而在任务进入时用上下文 bandit 只选一次模型，后续调用固定到该后端，再以终局准确率与延迟更新策略。系统不需要显式预测任务难度，并在三项 Agent 基准上形成非支配的准确率—延迟前沿。tau2-Bench 在延迟匹配下提升 7–8 个准确率点；Terminal-Bench 相比最强单模型提升 7.1 点，同时降低 36% 延迟。",
+      "why": "对多模型 Agent 平台而言，路由决策、反馈粒度和 SLA 必须处在同一任务边界；这项结果给出了可量化的在线学习基线。",
+      "url": "https://arxiv.org/abs/2607.22465",
+      "tags": [
+        "上下文 Bandit",
+        "多模型路由",
+        "任务级反馈",
+        "延迟优化"
+      ]
+    },
     {
       "category": "学习式视频编码",
       "sourceType": "blog",
