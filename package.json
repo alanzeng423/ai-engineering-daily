@@ -10,7 +10,7 @@
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "deploy": "WRANGLER_LOG_PATH=.wrangler/wrangler.log wrangler deploy",
-    "test": "npm run digest:check && npm run build && node --test tests/*.test.mjs",
+    "test": "npm run sources:check && npm run digest:check && npm run build && node --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "digest:check": "node scripts/check-content.mjs",
     "digest:validate": "node scripts/validate-digest.mjs",
@@ -19,8 +19,11 @@
     "digest:recover": "node scripts/recover-publication.mjs",
     "digest:finalize": "node scripts/finalize-publication.mjs",
     "catalog:build": "node scripts/rebuild-catalog.mjs",
+    "sources:check": "node scripts/source-watchlist.mjs",
     "research:init": "node scripts/init-research-run.mjs",
     "research:query": "node scripts/append-research-query.mjs",
+    "research:coverage": "node scripts/append-source-coverage.mjs",
+    "research:collect:x": "node scripts/collect-x-sources.mjs",
     "research:validate": "node scripts/validate-research-run.mjs"
   },
   "dependencies": {

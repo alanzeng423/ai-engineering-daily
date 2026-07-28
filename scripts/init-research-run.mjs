@@ -51,6 +51,8 @@ while (true) {
 
 await mkdir(resolve(runDirectory, "retrievals"), { recursive: true });
 await mkdir(resolve(runDirectory, "query-entries"), { recursive: true });
+await mkdir(resolve(runDirectory, "coverage-entries"), { recursive: true });
+await mkdir(resolve(runDirectory, "source-candidates"), { recursive: true });
 const common = { schemaVersion: 1, targetDate };
 const manifest = {
   schemaVersion: 1,
@@ -77,6 +79,7 @@ const manifest = {
 const files = {
   "manifest.json": manifest,
   "queries.json": { ...common, queries: [] },
+  "coverage.json": { ...common, generatedAt: null, entries: [] },
   "candidates.json": { ...common, generatedAt: null, candidates: [] },
   "verification.json": { ...common, generatedAt: null, verifications: [] },
   "scores.json": { ...common, generatedAt: null, scores: [] },

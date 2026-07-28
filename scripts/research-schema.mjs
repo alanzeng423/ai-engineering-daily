@@ -19,6 +19,16 @@ const RUN_STAGES = new Set([
   "completed",
 ]);
 const RETRIEVAL_KINDS = new Set(["search", "feed", "api", "source", "repository", "social"]);
+const COVERAGE_STATUSES = new Set(["success", "degraded", "failed"]);
+const DATE_STATUSES = new Set(["eligible", "ineligible", "unresolved"]);
+const REQUIRED_COVERAGE_CHANNELS = [
+  "x",
+  "official",
+  "chinese-media",
+  "open-web",
+  "papers",
+  "recall-sentinel",
+];
 
 function isObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -61,6 +71,7 @@ export function validateResearchArtifacts(artifacts, options = {}) {
   const {
     manifest,
     queries,
+    coverage,
     retrievals,
     candidates,
     verification,
@@ -88,6 +99,7 @@ export function validateResearchArtifacts(artifacts, options = {}) {
   const targetDate = manifest.targetDate;
   const ledgers = [
     ["queries.json", queries],
+    ["coverage.json", coverage],
     ["candidates.json", candidates],
     ["verification.json", verification],
     ["scores.json", scores],
@@ -130,6 +142,45 @@ export function validateResearchArtifacts(artifacts, options = {}) {
     }
   }
 
+  const coverageItems = Array.isArray(coverage?.entries) ? coverage.entries : [];
+  if (!Array.isArray(coverage?.entries)) errors.push("coverage.entries 必须是数组");
+  uniqueIds(coverageItems, "id", "coverage.entries", errors);
+  for (const [index, entry] of coverageItems.entries()) {
+    if (!hasText(entry.channel)) errors.push(`coverage.entries[${index}].channel 不能为空`);
+    if (!COVERAGE_STATUSES.has(entry.status)) {
+      errors.push(`coverage.entries[${index}].status 不受支持`);
+    }
+    if (!isIsoDateTime(entry.startedAt)) {
+      errors.push(`coverage.entries[${index}].startedAt 必须是 ISO 时间`);
+    }
+    if (!isIsoDateTime(entry.completedAt)) {
+      errors.push(`coverage.entries[${index}].completedAt 必须是 ISO 时间`);
+    }
+    for (const key of ["planned", "attempted", "succeeded", "failed", "rawResults", "eligibleCandidates"]) {
+      if (!Number.isInteger(entry[key]) || entry[key] < 0) {
+        errors.push(`coverage.entries[${index}].${key} 必须是非负整数`);
+      }
+    }
+    if (
+      Number.isInteger(entry.attempted) &&
+      Number.isInteger(entry.succeeded) &&
+      Number.isInteger(entry.failed) &&
+      entry.succeeded + entry.failed !== entry.attempted
+    ) {
+      errors.push(`coverage.entries[${index}] 的 succeeded + failed 必须等于 attempted`);
+    }
+    if (!Array.isArray(entry.retrievalIds) || entry.retrievalIds.length === 0) {
+      errors.push(`coverage.entries[${index}].retrievalIds 至少包含一项`);
+    } else {
+      for (const id of entry.retrievalIds) {
+        if (!retrievalIds.has(id)) {
+          errors.push(`coverage.entries[${index}] 引用了不存在的 retrievalId: ${id}`);
+        }
+      }
+    }
+    if (!Array.isArray(entry.notes)) errors.push(`coverage.entries[${index}].notes 必须是数组`);
+  }
+
   const candidateItems = Array.isArray(candidates?.candidates) ? candidates.candidates : [];
   if (!Array.isArray(candidates?.candidates)) errors.push("candidates.candidates 必须是数组");
   const candidateIds = uniqueIds(candidateItems, "id", "candidates", errors);
@@ -146,6 +197,12 @@ export function validateResearchArtifacts(artifacts, options = {}) {
     for (const id of candidate.queryIds ?? []) {
       if (!queryIds.has(id)) errors.push(`candidates[${index}] 引用了不存在的 queryId: ${id}`);
     }
+    if (complete && !hasText(candidate.eventId)) {
+      errors.push(`candidates[${index}].eventId 在完整运行中不能为空`);
+    }
+    if (complete && (!Array.isArray(candidate.discoveredVia) || candidate.discoveredVia.length === 0)) {
+      errors.push(`candidates[${index}].discoveredVia 在完整运行中至少包含一项`);
+    }
   }
 
   const verificationItems = Array.isArray(verification?.verifications)
@@ -160,6 +217,23 @@ export function validateResearchArtifacts(artifacts, options = {}) {
     if (!isIsoDateTime(item.checkedAt)) errors.push(`verification[${index}].checkedAt 必须是 ISO 时间`);
     if (typeof item.accessible !== "boolean") errors.push(`verification[${index}].accessible 必须是布尔值`);
     if (typeof item.dateEligible !== "boolean") errors.push(`verification[${index}].dateEligible 必须是布尔值`);
+    if (!DATE_STATUSES.has(item.dateStatus)) {
+      errors.push(`verification[${index}].dateStatus 不受支持`);
+    } else if (item.dateEligible !== (item.dateStatus === "eligible")) {
+      errors.push(`verification[${index}].dateEligible 必须与 dateStatus 一致`);
+    }
+    if (!Array.isArray(item.dateEvidence)) {
+      errors.push(`verification[${index}].dateEvidence 必须是数组`);
+    }
+    if (!Array.isArray(item.provenanceAttempts)) {
+      errors.push(`verification[${index}].provenanceAttempts 必须是数组`);
+    }
+    if (complete && item.dateStatus === "eligible" && item.dateEvidence?.length === 0) {
+      errors.push(`verification[${index}] 日期合格时必须记录 dateEvidence`);
+    }
+    if (complete && item.dateStatus === "unresolved" && item.provenanceAttempts?.length < 2) {
+      errors.push(`verification[${index}] 日期未决时必须至少完成 2 次一手溯源尝试`);
+    }
     if (!Array.isArray(item.evidence)) errors.push(`verification[${index}].evidence 必须是数组`);
     if (!Array.isArray(item.rejectionReasons)) {
       errors.push(`verification[${index}].rejectionReasons 必须是数组`);
@@ -202,6 +276,15 @@ export function validateResearchArtifacts(artifacts, options = {}) {
       errors.push(`入选候选 ${id} 必须完成评分且达到 70 分`);
     }
   }
+  const selectedEventIds = new Set();
+  for (const id of selectedIds) {
+    const eventId = candidateItems.find((candidate) => candidate.id === id)?.eventId;
+    if (!eventId) continue;
+    if (selectedEventIds.has(eventId)) {
+      errors.push(`同一事件不得重复入选：${eventId}`);
+    }
+    selectedEventIds.add(eventId);
+  }
   for (const [index, rejected] of rejectedItems.entries()) {
     if (!candidateIds.has(rejected.candidateId)) {
       errors.push(`selection.rejected[${index}] 引用了不存在的 candidateId`);
@@ -212,6 +295,38 @@ export function validateResearchArtifacts(artifacts, options = {}) {
   }
 
   if (complete) {
+    const latestCoverageByChannel = new Map();
+    for (const entry of coverageItems) latestCoverageByChannel.set(entry.channel, entry);
+    for (const channel of REQUIRED_COVERAGE_CHANNELS) {
+      const entry = latestCoverageByChannel.get(channel);
+      if (!entry) {
+        errors.push(`完整运行缺少来源覆盖记录：${channel}`);
+      } else if (entry.status === "failed") {
+        errors.push(`完整运行的来源渠道失败：${channel}`);
+      }
+    }
+    const unmetRequirements = Array.isArray(selection?.unmetRequirements)
+      ? selection.unmetRequirements
+      : [];
+    if (!Array.isArray(selection?.unmetRequirements)) {
+      errors.push("完整运行的 selection.unmetRequirements 必须是数组");
+    }
+    for (const [channel, entry] of latestCoverageByChannel) {
+      if (
+        REQUIRED_COVERAGE_CHANNELS.includes(channel) &&
+        entry.status === "degraded" &&
+        !unmetRequirements.some((requirement) =>
+          typeof requirement === "string" && requirement.toLowerCase().includes(channel.toLowerCase()),
+        )
+      ) {
+        errors.push(`降级来源必须在 selection.unmetRequirements 明确记录：${channel}`);
+      }
+    }
+    const xEntries = coverageItems.filter((entry) => entry.channel === "x");
+    const latestX = xEntries.at(-1);
+    if (latestX?.eligibleCandidates === 0 && xEntries.length < 2) {
+      errors.push("X 目标日期候选为 0 时必须至少重试一次并保存第二条覆盖记录");
+    }
     if (retrievalItems.length === 0) errors.push("完整运行至少要有一条 retrieval 记录");
     if (candidateItems.length === 0) errors.push("完整运行至少要有一条候选记录");
     for (const id of candidateIds) {
@@ -309,6 +424,7 @@ export async function readResearchRun(runDirectory, options = {}) {
   const artifacts = {
     manifest: await readJson(resolve(root, "manifest.json")),
     queries: await readJson(resolve(root, "queries.json")),
+    coverage: await readJson(resolve(root, "coverage.json")),
     retrievals,
     candidates: await readJson(resolve(root, "candidates.json")),
     verification: await readJson(resolve(root, "verification.json")),

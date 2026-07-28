@@ -16,6 +16,8 @@ function completeRun() {
     discoveredAt: "2026-07-22T01:31:00Z",
     queryIds: ["query-001"],
     retrievalIds: ["retrieval-001"],
+    eventId: "event-agent-reliability",
+    discoveredVia: ["official"],
   };
   const digest = {
     schemaVersion: 1,
@@ -60,6 +62,27 @@ function completeRun() {
         },
       ],
     },
+    coverage: {
+      schemaVersion: 1,
+      targetDate,
+      entries: ["x", "official", "chinese-media", "open-web", "papers", "recall-sentinel"].map(
+        (channel, index) => ({
+          id: `coverage-${String(index + 1).padStart(2, "0")}`,
+          channel,
+          status: "success",
+          startedAt: "2026-07-22T01:30:00Z",
+          completedAt: "2026-07-22T01:31:00Z",
+          planned: 1,
+          attempted: 1,
+          succeeded: 1,
+          failed: 0,
+          rawResults: 1,
+          eligibleCandidates: 1,
+          retrievalIds: ["retrieval-001"],
+          notes: [],
+        }),
+      ),
+    },
     retrievals: [
       {
         schemaVersion: 1,
@@ -83,6 +106,9 @@ function completeRun() {
           checkedAt: "2026-07-22T01:35:00Z",
           accessible: true,
           dateEligible: true,
+          dateStatus: "eligible",
+          dateEvidence: [{ value: "2026-07-21", source: candidate.url }],
+          provenanceAttempts: [{ method: "original-page", url: candidate.url }],
           evidence: [{ claim: "给出恢复成功率", locator: "Results" }],
           rejectionReasons: [],
         },
@@ -112,6 +138,7 @@ function completeRun() {
       targetDate,
       selectedIds: [candidate.id],
       rejected: [],
+      unmetRequirements: [],
     },
     digest,
     checks: {
@@ -158,6 +185,51 @@ test("rejects a candidate that references a missing retrieval batch", () => {
   run.candidates.candidates[0].retrievalIds = ["retrieval-missing"];
   const errors = validateResearchArtifacts(run, { complete: true });
   assert.ok(errors.some((error) => error.includes("不存在的 retrievalId")));
+});
+
+test("rejects duplicate selected artifacts from the same event", () => {
+  const run = completeRun();
+  const duplicate = {
+    ...run.candidates.candidates[0],
+    id: "candidate-002",
+    title: "同一发布事件的第二个页面",
+    url: "https://example.com/agent-reliability-release",
+    canonicalUrl: "https://example.com/agent-reliability-release",
+  };
+  run.candidates.candidates.push(duplicate);
+  run.verification.verifications.push({
+    ...run.verification.verifications[0],
+    candidateId: duplicate.id,
+  });
+  run.scores.scores.push({ ...run.scores.scores[0], candidateId: duplicate.id });
+  run.selection.selectedIds.push(duplicate.id);
+  run.digest.items.push({ ...run.digest.items[0], title: duplicate.title, url: duplicate.url });
+  const errors = validateResearchArtifacts(run, { complete: true });
+  assert.ok(errors.some((error) => error.includes("同一事件不得重复入选")));
+});
+
+test("requires an explicit retry when X discovery returns zero eligible candidates", () => {
+  const run = completeRun();
+  const xEntry = run.coverage.entries.find((entry) => entry.channel === "x");
+  xEntry.status = "degraded";
+  xEntry.eligibleCandidates = 0;
+  run.selection.unmetRequirements = ["x: 目标日期未发现合格候选"];
+  const errors = validateResearchArtifacts(run, { complete: true });
+  assert.ok(errors.some((error) => error.includes("至少重试一次")));
+});
+
+test("requires two provenance attempts before leaving a publication date unresolved", () => {
+  const run = completeRun();
+  const verification = run.verification.verifications[0];
+  verification.dateEligible = false;
+  verification.dateStatus = "unresolved";
+  verification.dateEvidence = [];
+  verification.provenanceAttempts = [{ method: "original-page", url: run.candidates.candidates[0].url }];
+  run.selection.selectedIds = [];
+  run.selection.rejected = [{ candidateId: "candidate-001", reasons: ["日期未决"] }];
+  run.digest.items = [];
+  const errors = validateResearchArtifacts(run, { complete: true });
+  assert.ok(errors.some((error) => error.includes("至少完成 2 次一手溯源尝试")));
 });
 
 test("accepts a complete historical backfill with a baseline collection", () => {

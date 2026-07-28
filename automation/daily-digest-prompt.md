@@ -27,32 +27,46 @@
 9. 写出公开草稿前，先把完全相同的最终日报对象保存为 RUN_DIRECTORY/digest.json；不得只保存 content/inbox 副本。
 10. checks.json 逐条保存本任务执行的校验、测试、Git、GitHub Check、部署和正式域名验证，包括命令、开始/结束时间、退出码以及 stdout/stderr 或远端状态。manifest.json 的 stage、counts 和时间在每阶段完成时同步更新。
 11. 任一步失败，都必须保留已有 retrieval 和阶段文件，更新 manifest 为 failed、finishedAt 和结构化 failure，并追加失败事件；禁止为了下次重跑而清理本次目录。
+12. coverage.json 与 coverage-entries/ 保存各来源渠道的实际执行情况；source-candidates/ 保存适配器输出的完整候选。它们与 retrievals 一样属于必须保留的研究产物，不得只在对话中概述。
 
 【历史去重】
 1. 读取 content/index.json、content/latest.json、content/baseline.json、content/catalog.json、scripts/digest-schema.mjs，以及最近 14 天已归档的 content/digests/*.json；建立既有 URL、标题、主题和事件清单。基底库用于全历史去重，最近 14 天归档用于事件级强去重。
 2. 同一论文、产品发布、项目版本或事件在近 14 天内原则上只收录一次。只有出现实质性新增结果、版本或工程细节时才可再次收录，并在摘要中明确新增内容。
 
+【机器可执行信源覆盖与门禁：强制】
+1. 开始发现前运行 `npm run sources:check`，并完整读取 sources/watchlist.json。信源表是必须执行的覆盖计划，不是供参考的例子；禁止只用几条泛化搜索词替代固定信源扫描。
+2. 首先运行免费 X 双源适配器：`npm run research:collect:x -- RUN_DIRECTORY --strict`。它会优先扫描 FxTwitter/FxEmbed 中的白名单账号，失败账号自动回退到 XGo，逐请求保存 retrieval，并在 source-candidates/ 与 coverage.json 落盘。必须逐条审阅最新的 source-candidates/x-*.json，先处理 dateEligible=true 且 reviewPriority 为 high/medium 的条目，再检查 low 是否含被启发式低估的重要一手发布；signalScore 只用于审阅排序，不得替代正式评分。目标日期候选可进入核验，次日早间 discoveryLead 只能用于反向发现目标日期的一手事件。
+3. 若 X 命令以退出码 2 返回 degraded，记录 checks/events 后完整重跑该命令 1 次。第二次仍 degraded 时可以继续其他渠道，但必须在 selection.unmetRequirements 中以 `x:` 开头写明缺口；若两次均 failed，则本期发现阶段失败。最终稿不强制收录 X 条目，但“X 候选为 0”必须有两次覆盖记录，不能解释为当天没有推文。
+4. 除 X 外，每次运行必须为以下渠道各写至少一条 coverage 记录：official、chinese-media、open-web、papers、recall-sentinel。先用 apply_patch 创建新的不可变 `coverage-entries/NNNN.json`，再运行 `npm run research:coverage -- RUN_DIRECTORY 条目文件` 原子追加。每条包含 id、channel、status、startedAt、completedAt、planned、attempted、succeeded、failed、rawResults、eligibleCandidates、retrievalIds、notes；succeeded + failed 必须等于 attempted。
+5. official：逐一检查 watchlist 中 priority=1 的官方博客、研究页、GitHub/Hugging Face 组织或 Release，再抽查 priority=2；必须保存每个来源的访问结果。chinese-media：逐一扫描机器之心、新智元、量子位、智源社区、PaperWeekly、AI 前线，微信公众号或转载页主要用作发现线索，随后回到报告、仓库、博客或原帖等一手来源；只有独家采访或独立深度分析才直接作为最终来源。
+6. open-web：至少两轮中英文检索。第一轮先广泛覆盖发布、技术报告、工程博客、产品更新、实证研究和高信号讨论；第二轮根据候选池的缺失机构、来源类型、主题和关键实体定向补搜。每轮后先问“还缺哪个来源类别、机构、事件或证据”，把答案和下一轮检索式写入 queries/retrievals，禁止一次性执行固定关键词后停止。
+7. papers：在非论文候选池已建立后扫描相关 arXiv/OpenReview/Hugging Face Papers；不得让论文的易检索性挤占工程、产品与社交信号。recall-sentinel：形成初步候选池后逐一检查 HuggingNews、Techmeme、Hugging Face Daily Papers、Hacker News 以及中文媒体热点；若哨兵出现候选池没有的高信号事件，至少追加一次定向检索。哨兵和媒体默认不作为事实终点。
+8. coverage 最新记录为 degraded 的渠道必须在 selection.unmetRequirements 中用对应 channel 名称明确说明。完整运行只有在六个渠道均有记录、没有 failed、所有 degraded 均已显式披露时才能通过；不得把渠道未执行伪装成“没有高质量内容”。
+
 【阶段一：候选收集】
 1. 将 manifest.stage 更新为 discovery。采用“固定高质量来源优先 + 全网探索补充”的两阶段检索，不把搜索引擎摘要当作事实来源，并严格按上面的归档规则逐批写 retrieval 和 queries。
-2. 固定来源优先覆盖：OpenAI、Anthropic、Google DeepMind、Google Research、Meta AI、Microsoft Research、GitHub、Hugging Face、Cloudflare、Vercel 等官方研究或工程渠道；Codex、Claude Code、GitHub Copilot 等产品的官方博客、Changelog、GitHub Release；相关实验室、论文作者和高信号工程负责人公开账号；arXiv 的 cs.SE、cs.AI、cs.CL、cs.LG 等相关论文。
+2. 固定来源以 sources/watchlist.json 为准，优先覆盖 OpenAI、Anthropic、Google DeepMind、Google Research、Meta AI、Microsoft Research、GitHub、Hugging Face、Cloudflare、Vercel、Moonshot/Kimi、Qwen、DeepSeek 等官方研究或工程渠道；Codex、Claude Code、GitHub Copilot 等产品的官方博客、Changelog、GitHub Release；白名单研究者、工程负责人公开账号；arXiv 的 cs.SE、cs.AI、cs.CL、cs.LG 等相关论文。
 3. 固定来源列表只是优先级，不是封闭白名单。必须再以中英文进行探索检索，覆盖 LLM、AI、Agent、Coding Agent、Codex、Claude Code、软件工程、SE、AI4SE、代码生成、程序修复、测试、评测、可观测性、安全、上下文工程和 Agent 基础设施。这些词是彼此重叠的检索方向，不是互斥分类，也不要求出现在最终主题或标签中。
 4. 社区聚合站、媒体报道和搜索结果只能用于发现候选；最终条目优先链接原创作者、项目或机构的一手来源。
 5. 候选来源包括公开推文或帖子、研究者与工程团队博客、公司技术博客、论文、项目发布、Release、Changelog 及其他包含实质技术信息的原创文章。先建立非论文候选池并分别覆盖官方工程或产品博客、公开技术长文或社交原帖、GitHub/Hugging Face/开源发布，再检索论文补充；不得因 arXiv 易检索而提前结束非论文检索。候选池目标为 30–60 条，其中非论文候选不少于 20 条；公开信息不足时不凑数，并在 selection.json 和最终报告说明。
-6. 阶段完成后写全 candidates.json，更新 manifest.counts.rawDiscoveries、normalizedCandidates 和 retrievalBatches，并追加阶段完成事件。
+6. 以“事件”而不是单个 URL 组织候选。同一发布的 X 公告、GitHub 仓库或 commit、Hugging Face 页面、博客和技术报告共享同一个稳定 eventId；每个候选必须记录 eventId、discoveredVia、queryIds、retrievalIds。一个渠道发现的线索必须沿链接扩展到同事件的其他一手 artifact，不能把它们当成互不相关的新闻。
+7. 阶段完成后写全 candidates.json，更新 manifest.counts.rawDiscoveries、normalizedCandidates 和 retrievalBatches，并追加阶段完成事件。
 
 【阶段二：原文与日期核验】
 1. 将 manifest.stage 更新为 verification。每个候选必须打开原文，核实标题、作者或机构、正文内容、原始 HTTPS 链接和首次公开时间；每次打开均写独立 retrieval 文件。
 2. 将首次公开时间换算到 Asia/Shanghai，只有属于目标日期的内容才能收录。博客使用首次发布日期而非仅有的更新时间；arXiv 使用 v1 首次提交时间；GitHub 使用 Release 的 published_at；社交帖子使用原帖时间。
-3. 只有模糊日期、无法确认时区、页面不可访问、正文无法读取或只能看到搜索摘要的候选直接舍弃。禁止根据摘要、转述或标题猜测，但必须把访问结果和舍弃原因写进 verification.json。
-4. 阶段完成后确保每个 candidateId 都有 verification 记录，更新 manifest.counts.verifiedCandidates 并追加阶段完成事件。
+3. 页面日期模糊、无法确认时区或页面不可访问时不得立即舍弃。必须沿同一事件的一手 provenance 继续核验，依次尝试官方博客/报告、GitHub commit 或 Release API、X 原帖时间、Hugging Face API、版本历史等；至少完成 2 次不同的一手溯源尝试后，仍无法确认才标记 unresolved。搜索摘要和媒体转载只能提供检索方向，不能充当最终日期证据。
+4. verification.json 的每条记录除既有字段外必须包含 dateStatus（eligible、ineligible 或 unresolved）、dateEvidence 和 provenanceAttempts。dateEligible 必须与 dateStatus=eligible 一致；日期合格必须保存原始时间文本、时区、换算结果及来源定位，unresolved 必须保存至少 2 次溯源尝试。类似“模型页无日期但官方 GitHub commit 与 X 公告可证明首次公开时间”的情况应继续追踪，而不是在评分前丢弃。
+5. 阶段完成后确保每个 candidateId 都有 verification 记录，更新 manifest.counts.verifiedCandidates 并追加阶段完成事件。
 
 【阶段三：评分、去重与来源平衡】
 1. 将 manifest.stage 更新为 scoring。对核验后的候选按 100 分评分：来源权威性与原创性 20、技术深度 25、新颖性 20、实验或工程证据 20、对目标读者的实践价值 15。
 2. 低于 70 分不收录。转载、重复报道、纯营销、融资新闻、标题党、缺乏实质技术内容或只有观点没有证据的内容直接淘汰，但全部保留在 scores.json 和 selection.json。
 3. 同一事件只保留最权威、信息最完整的一手来源；同时检查 URL、标题和语义事件是否重复。
-4. 最终目标 8–12 条，按综合价值排序；宁缺毋滥，优质内容不足时允许少于 8 条，但至少 1 条。
-5. 来源多样性是发布门槛：论文最多 4 条且不得超过最终条目的 40%；非论文至少 4 条，优质内容不足时最终总数随之减少，不得用论文补位；同一域名或机构最多 2 条。最终结果应优先覆盖至少 2 条官方工程或产品博客、至少 1 条 GitHub/Hugging Face/开源发布或更新、至少 1 条可公开核验的社交原帖或技术长文。某一类型确实没有达到 70 分的候选时不得用低质量内容凑数，但在 selection.json 和最终报告说明缺口；不得因缺口突破论文上限。LLM、Agent、Coding Agent、AI4SE、SE 之间不设置数量配额。
-6. 写全 scores.json 和 selection.json，确保所有候选都有评分或未评分理由以及最终处置；更新 manifest.counts.scoredCandidates、selectedItems 并追加阶段完成事件。
+4. selection.selectedIds 中不得出现相同 eventId；最终 URL 通常选择内容最完整的一手 artifact，其他 artifact 保留在候选、检索和日期证据中。
+5. 最终目标 8–12 条，按综合价值排序；宁缺毋滥，优质内容不足时允许少于 8 条，但至少 1 条。
+6. 来源多样性是发布门槛：论文最多 4 条且不得超过最终条目的 40%；非论文至少 4 条，优质内容不足时最终总数随之减少，不得用论文补位；同一域名或机构最多 2 条。最终结果应优先覆盖至少 2 条官方工程或产品博客、至少 1 条 GitHub/Hugging Face/开源发布或更新、至少 1 条可公开核验的社交原帖或技术长文。某一类型确实没有达到 70 分的候选时不得用低质量内容凑数，但在 selection.json 和最终报告说明缺口；不得因缺口突破论文上限。LLM、Agent、Coding Agent、AI4SE、SE 之间不设置数量配额，也不为 X 强制凑数。
+7. 写全 scores.json 和 selection.json，确保所有候选都有评分或未评分理由以及最终处置；更新 manifest.counts.scoredCandidates、selectedItems 并追加阶段完成事件。
 
 【阶段四：编辑与 JSON】
 1. 将 manifest.stage 更新为 editing。若目标日期已有归档，沿用其 issue；若是新日期，issue 使用当前最新 issue + 1；尚无首期时使用 1。
@@ -87,4 +101,4 @@
 4. 全部成功后更新 manifest：status=completed、stage=completed、finishedAt、最终 counts，追加完成事件，然后运行 `npm run research:validate -- RUN_DIRECTORY --complete`。若完整性校验失败，改记 failed 并报告，不得隐瞒缺失的中间产物。
 
 【最终报告】
-用中文简短报告：本次缺期列表、逐日期的 RUN_DIRECTORY 与 run attempt、检索批次数、原始发现数、规范候选数、完成核验数、最终条目数、来源与论文占比、研究产物完整性校验、事务测试与回滚状态、Git 提交 SHA、推送尝试、Cloudflare 构建与正式域名验证尝试及网站链接。不要重复整份日报，不输出趋势观察。
+用中文简短报告：本次缺期列表、逐日期的 RUN_DIRECTORY 与 run attempt、六个来源渠道的 coverage 状态（尤其 X 计划/成功账号、目标日期候选、是否回退 XGo、中文媒体与漏报哨兵覆盖）、检索批次数、原始发现数、规范候选数、完成核验数、最终条目数、来源与论文占比、研究产物完整性校验、事务测试与回滚状态、Git 提交 SHA、推送尝试、Cloudflare 构建与正式域名验证尝试及网站链接。不要重复整份日报，不输出趋势观察。

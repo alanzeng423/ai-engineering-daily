@@ -80,6 +80,11 @@ directory. The archive contains:
 - `retrievals/*.json`: one immutable record for every search, feed/API request,
   repository lookup, social lookup, and original-source read;
 - `queries.json`: the complete query ledger and its retrieval batch IDs;
+- `coverage.json` and `coverage-entries/`: the execution status, result counts,
+  retries, and degradation notes for X, official sources, Chinese discovery
+  media, open-web search, papers, and recall sentinels;
+- `source-candidates/`: immutable normalized output from source adapters before
+  editorial verification and scoring;
 - `candidates.json`: the normalized candidate pool, including duplicates;
 - `verification.json`: date checks, access results, source metadata, evidence,
   and rejection reasons for every candidate;
@@ -102,6 +107,21 @@ npm run research:init -- YYYY-MM-DD
 npm run research:validate -- research/runs/YYYY-MM-DD/<run-id>
 npm run research:validate -- research/runs/YYYY-MM-DD/<run-id> --complete
 ```
+
+The source plan is versioned in `sources/watchlist.json`. Validate it and run
+the free X account collector with:
+
+```bash
+npm run sources:check
+npm run research:collect:x -- research/runs/YYYY-MM-DD/<run-id> --strict
+```
+
+The collector scans the curated account list through FxTwitter/FxEmbed and
+falls back to the BestBlogs XGo feeds for failed accounts. It does not require
+an X account or API key, records every request as an immutable retrieval, and
+marks zero-candidate or low-coverage runs as degraded. X remains an optional
+editorial source: degraded discovery must be disclosed and retried, while the
+final issue never includes a weak post merely to satisfy a quota.
 
 ## Deployment
 
