@@ -1,13 +1,143 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-28T01:49:30.000Z",
-  "latestDigestDate": "2026-07-27",
-  "total": 87,
+  "generatedAt": "2026-07-30T02:35:00.000Z",
+  "latestDigestDate": "2026-07-28",
+  "total": 95,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-27"
+    "to": "2026-07-28"
   },
   "items": [
+    {
+      "category": "开放权重治理",
+      "sourceType": "blog",
+      "source": "Anthropic",
+      "publishedAt": "2026-07-28",
+      "readTime": "4 min",
+      "title": "Anthropic 公布开放权重模型立场与风险边界",
+      "summary": "Anthropic 针对外界对其开放权重立场的猜测发布完整说明，并由官方账号给出原文入口。该事件的核心不是新模型参数，而是实验室如何权衡模型能力扩散、可检查性与下游滥用风险。",
+      "why": "选用开放或闭源模型时，权重许可、责任边界和安全控制会直接影响部署与二次开发策略。",
+      "url": "https://www.anthropic.com/news/position-open-weights-models",
+      "tags": [
+        "开放权重",
+        "模型治理",
+        "风险评估"
+      ]
+    },
+    {
+      "category": "Coding Agent 路由",
+      "sourceType": "blog",
+      "source": "GitHub Blog",
+      "publishedAt": "2026-07-28",
+      "readTime": "5 min",
+      "title": "GitHub Copilot 用缓存、工具搜索与动态路由提高每次会话利用率",
+      "summary": "GitHub 说明 Copilot 通过 prompt caching 与 tool search 减少重复上下文，并让 Auto 根据任务意图和实时模型健康选择模型。官方评测称 HyDRA 达到与 OpenRouter Auto 相同的 70.8% 解决率，同时成本节省达到 3.3 倍。",
+      "why": "Agent 成本应按完成任务衡量；缓存、工具裁剪和路由需要在同一评测中同时观察解决率、延迟与价格。",
+      "url": "https://github.blog/ai-and-ml/github-copilot/getting-more-from-each-token-how-copilot-improves-context-handling-and-model-routing/",
+      "tags": [
+        "GitHub Copilot",
+        "模型路由",
+        "Prompt Caching",
+        "工具搜索"
+      ]
+    },
+    {
+      "category": "模型架构",
+      "sourceType": "x",
+      "source": "Sebastian Raschka",
+      "publishedAt": "2026-07-28",
+      "readTime": "8 min",
+      "title": "Kimi K3 架构把 LatentMoE、无位置编码与跨层残差放进同一系统",
+      "summary": "Sebastian Raschka 基于技术报告拆解 Kimi K3：模型从 Kimi Linear 扩到 2.8T 参数，引入 LatentMoE，并组合多头潜在注意力、Kimi Delta Attention 与 NoPE。跨层 attention residual 带来持续的小幅验证损失和下游收益，报告代价约为训练增加 4%、推理增加 2%。",
+      "why": "这份拆解把复杂架构变化对应到推理效率与残差路径，便于判断哪些组件值得在开源实现和消融实验中优先复核。",
+      "url": "https://x.com/rasbt/status/2082098201247600765",
+      "tags": [
+        "MoE",
+        "线性注意力",
+        "残差连接",
+        "推理效率"
+      ]
+    },
+    {
+      "category": "边缘文档处理",
+      "sourceType": "github",
+      "source": "run-llama",
+      "publishedAt": "2026-07-28",
+      "readTime": "4 min",
+      "title": "LlamaIndex 用脚手架把 LlamaParse Worker 部署到边缘",
+      "summary": "LlamaIndex 发布 create-llama-worker，可生成面向 Cloudflare Workers 的可运行项目，并配置 Parse、Classify 与 Extract 三类文档任务。开发者通过 npm create 命令获得代码和部署骨架，减少手工拼装边缘运行时的样板工作。",
+      "why": "文档 Agent 的延迟、数据边界和扩缩容常取决于解析层；可审计的脚手架比黑盒托管集成更便于复现和治理。",
+      "url": "https://github.com/run-llama/create-llama-worker",
+      "tags": [
+        "Cloudflare Workers",
+        "文档解析",
+        "脚手架"
+      ]
+    },
+    {
+      "category": "推理加速",
+      "sourceType": "x",
+      "source": "Modal",
+      "publishedAt": "2026-07-28",
+      "readTime": "4 min",
+      "title": "Modal 用 DFlash 将 Kimi K3 交互吞吐推到每秒 460 token",
+      "summary": "Modal 团队为 2.8T 参数 Kimi K3 构建定制 DFlash speculative decoding 模型，并报告共享 API 达到每秒 460 token。相关原帖把性能变化绑定到推测器实现和生产 Agent 工作负载，而不是只给出模型标称吞吐。",
+      "why": "超大 MoE 的可用性取决于服务端推测解码和端到端任务延迟；该数据为复测吞吐、接受率与成本提供了明确起点。",
+      "url": "https://x.com/modal/status/2081849259700236352",
+      "tags": [
+        "推测解码",
+        "MoE",
+        "推理吞吐"
+      ]
+    },
+    {
+      "category": "端侧生成模型",
+      "sourceType": "x",
+      "source": "NVIDIA AI",
+      "publishedAt": "2026-07-28",
+      "readTime": "4 min",
+      "title": "NVIDIA 将 Cosmos 模型面向边缘设备发布",
+      "summary": "NVIDIA AI 为 Cosmos 端侧模型发布 Hugging Face 技术入口，并报告该模型系列累计下载达到一千万次。公开信号确认了面向边缘部署的模型与资料入口，但下载量只是采用度指标，不等同于任务质量或设备性能基准。",
+      "why": "评估端侧生成模型时应区分生态采用度与实际延迟、功耗和质量；该发布提供了后续硬件复测的一手起点。",
+      "url": "https://x.com/NVIDIAAI/status/2081862557883670925",
+      "tags": [
+        "端侧推理",
+        "Cosmos",
+        "模型部署"
+      ]
+    },
+    {
+      "category": "视觉评测",
+      "sourceType": "blog",
+      "source": "Kimi",
+      "publishedAt": "2026-07-28",
+      "readTime": "5 min",
+      "title": "PerceptionBench 用三千道核验题拆解十种原子视觉能力",
+      "summary": "Moonshot AI 从 42 个现有基准中的前沿模型失败出发，归纳十种原子视觉感知能力，并构建 3,000 道经核验的问题。每题只隔离一种能力，答案应仅靠观察得到，不依赖外部知识或额外推理；发布同时给出博客、GitHub 与 Hugging Face 数据集入口。",
+      "why": "把感知与推理解耦能减少多模态评测中的归因混乱，也为模型回归定位提供更细粒度的失败类别。",
+      "url": "https://kimi.com/blog/perception-bench",
+      "tags": [
+        "多模态评测",
+        "视觉感知",
+        "基准测试"
+      ]
+    },
+    {
+      "category": "模型反馈闭环",
+      "sourceType": "x",
+      "source": "Qwen",
+      "publishedAt": "2026-07-28",
+      "readTime": "3 min",
+      "title": "Qwen 汇总 Qwen3.8-Max-Preview 的开发者反馈",
+      "summary": "Qwen 团队在预览版发布后公开回应开发者反馈，形成从模型试用到版本修正的官方反馈节点。目标日原帖没有给出足够完整的变更清单，因此本条只保留已公开确认的反馈闭环，不外推未披露的性能变化。",
+      "why": "预览模型进入生产前，应把公开反馈、已确认缺陷与后续版本修复绑定到同一验收记录。",
+      "url": "https://x.com/Alibaba_Qwen/status/2082093488720708065",
+      "tags": [
+        "Qwen",
+        "预览版本",
+        "反馈闭环"
+      ]
+    },
     {
       "category": "端侧 Agent",
       "sourceType": "reddit",
