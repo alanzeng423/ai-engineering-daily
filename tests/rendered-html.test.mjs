@@ -56,7 +56,12 @@ test("renders the cumulative content catalog", async () => {
   assert.match(html, /data-source-brand="openai"/);
   assert.match(html, /data-source-brand="harness\.io"/);
   assert.match(html, /aria-label="标签筛选"/);
-  assert.doesNotMatch(html, /首期内容准备中|第 001 期|每天 09:30 更新|日报|关于/);
+  assert.doesNotMatch(html, /首期内容准备中|第 001 期|每天 09:30 更新/);
+
+  const header = html.match(/<header\b[^>]*class="site-header"[^>]*>[\s\S]*?<\/header>/)?.[0];
+  assert.ok(header);
+  assert.doesNotMatch(header, />\s*(?:日报|关于)\s*</);
+  assert.doesNotMatch(header, /href="\/(?:daily|about)"/);
 
   assert.doesNotMatch(html, /从代码补全到长期运行|codex-preview|示例数据|趋势观察/);
 });
