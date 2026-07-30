@@ -8,11 +8,12 @@
 每天 09:30（Asia/Shanghai）生成并发布“昨日 AI 与软件工程精选”，并自动补偿尚未发布的最近缺期。目标读者是有技术背景的 AI、Agent 与软件工程从业者；只收录能影响研究判断、工程实践或工具选择的一手信息。本任务只有在完整研究过程成功落盘、日报 JSON 成功推送到 GitHub，并确认 Cloudflare 自动部署和正式域名内容后才算完成；不要只在任务对话中输出摘要。
 
 【缺期补偿与有限重试：强制】
-1. 以上海时区的前一自然日为 LATEST_ALLOWED_DATE。读取 content/index.json，从最新已归档日期的下一天到 LATEST_ALLOWED_DATE 建立缺期列表；按日期升序处理，单次任务最多处理 2 个日期。若没有缺期，确认工作区和 origin/main 一致后简短报告“无需更新”并结束，不重复生成已有日期。
-2. 同一目标日期必须完整成功后才能进入下一日期；不得跳过失败日期。下一次 09:30 仍从最早缺期开始，因此进程级中断也能自动补偿。
-3. 搜索、Feed/API、原文访问、git fetch/pull/push 等瞬时网络失败最多尝试 3 次，间隔 15、30、60 秒；每次尝试都单独写 retrieval、checks 和 events，禁止覆盖失败记录。HTTP 4xx、日期不合格、正文不可读、JSON/schema/test 失败属于确定性失败，不盲目重试。
-4. Cloudflare Check 和正式域名属于异步传播：每 20 秒检查一次，最多等待 10 分钟。可以用带提交 SHA 的 cache-busting URL 辅助诊断，但最终必须由不带查询参数的正式 URL 通过验证。
-5. 单个请求重试耗尽后，将当前 run 完整标记 failed。只有明确属于瞬时基础设施故障、尚未创建 Git 提交且工作区已自动恢复干净时，才允许为同一目标日期新建 1 个 run-id 重试整期；每个目标日期每次定时任务最多 2 个 run。内容、schema 或测试失败不得用重复生成掩盖。
+1. 以上海时区的前一自然日为 LATEST_ALLOWED_DATE。建立新缺期列表前，先扫描本地最近运行档案：若存在 stage=deployment、checks.git.pushed=true 且尚未由 deployment:verify 闭环的 run，按目标日期和开始时间升序用原 RUN_DIRECTORY 与 commitSha 重跑确定性部署验证；成功后再继续，仍失败则保留新证据并停止，禁止重复生成或重复发布同一天内容。deployment-verification.json 必须追加保存每次验证 attempt，不得覆盖旧失败证据。
+2. 读取 content/index.json，从最新已归档日期的下一天到 LATEST_ALLOWED_DATE 建立缺期列表；按日期升序处理，单次任务最多处理 2 个日期。若没有待恢复的部署和内容缺期，确认工作区和 origin/main 一致后简短报告“无需更新”并结束，不重复生成已有日期。
+3. 同一目标日期必须完整成功后才能进入下一日期；不得跳过失败日期。下一次 09:30 仍从最早待恢复部署或缺期开始，因此进程级中断也能自动补偿。
+4. 搜索、Feed/API、原文访问、git fetch/pull/push 等瞬时网络失败最多尝试 3 次，间隔 15、30、60 秒；每次尝试都单独写 retrieval、checks 和 events，禁止覆盖失败记录。HTTP 4xx、日期不合格、正文不可读、JSON/schema/test 失败属于确定性失败，不盲目重试。
+5. Cloudflare Check 和正式域名属于异步传播：每 20 秒检查一次，最多等待 10 分钟。可以用带提交 SHA 的 cache-busting URL 辅助诊断，但最终必须由不带查询参数的正式 URL 通过验证。
+6. 单个请求重试耗尽后，将当前 run 完整标记 failed。只有明确属于瞬时基础设施故障、尚未创建 Git 提交且工作区已自动恢复干净时，才允许为同一目标日期新建 1 个 run-id 重试整期；每个目标日期每次定时任务最多 2 个 run。内容、schema 或测试失败不得用重复生成掩盖。
 
 【目标日期与运行档案初始化】
 1. 工作目录固定为 /Users/alanzeng/Documents/schedule-daily。
@@ -102,10 +103,11 @@
 6. 推送成功后运行 `npm run digest:finalize -- RUN_DIRECTORY COMMIT_SHA`，将发布事务绑定到已推送提交并记录命令；失败时不得声称事务完成。
 
 【部署验证与运行收尾】
-1. 将 manifest.stage 更新为 deployment。推送后取得新提交 SHA，按“缺期补偿与有限重试”中的轮询策略等待该提交的 GitHub Check“Workers Builds: ai-engineering-daily”完成，并将每次状态、结论及详情链接写入 checks.json。
-2. Check 成功后轮询访问 https://ai.alanzeng.com，确认 HTTP 200、页面包含本期日期和至少一条本期标题，并且渲染出的 article 数量与 content/catalog.json 的 total 一致。再访问 https://ai.alanzeng.com/today，确认 HTTP 200、页面包含本期 overview 与至少一条本期标题，并且渲染出的 article 数量与 content/latest.json 的 items 数量一致；每次尝试均记录验证时间、HTTP 状态、观察值和是否命中旧缓存。workers.dev 和 cache-busting 地址只可作为故障诊断，不能替代正式 URL 的最终成功。
-3. Check 失败、合理等待后仍未完成或正式域名不匹配时，按失败流程收尾，不得声称已上线。
-4. 全部成功后更新 manifest：status=completed、stage=completed、finishedAt、最终 counts，追加完成事件，然后运行 `npm run research:validate -- RUN_DIRECTORY --complete`。若完整性校验失败，改记 failed 并报告，不得隐瞒缺失的中间产物。
+1. 将 manifest.stage 更新为 deployment。推送并完成 `digest:finalize` 后，只运行 `env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY npm run deployment:verify -- RUN_DIRECTORY COMMIT_SHA` 完成 Cloudflare Check 与正式域名验证。该脚本按 20 秒间隔、10 分钟上限查询与 COMMIT_SHA 精确匹配的 GitHub Check“Workers Builds: ai-engineering-daily”，并在 Check 真实返回 status=completed、conclusion=success 且含 completed_at 后才继续。
+2. `deployment:verify` 随后使用不带查询参数的 https://ai.alanzeng.com 与 /today 核对 HTTP 200、目标日期、overview、至少一条标题及 article 数量，并把每次实际观察写入 RUN_DIRECTORY/deployment-verification.json。workers.dev 和 cache-busting 地址只可诊断，不能替代正式 URL。
+3. `scripts/verify-deployment.mjs` 是唯一允许写入部署成功状态、manifest.status=completed 和部署完成事件的入口。禁止模型手工构造、补写或推断 Cloudflare 成功状态，禁止在 Check 仍为 queued/in_progress、缺少 completed_at、或时间顺序不可能时标记 completed；页面已可访问也不能替代 Check 成功。
+4. Check 失败、10 分钟后仍未完成或正式域名不匹配时，脚本会原子写入失败证据并把 run 标记 failed；保留已推送内容与所有中间产物，不得覆盖失败状态。下一次任务先对这类已推送但部署未闭环的 run 重新执行同一确定性验证，再开始新的缺期。
+5. `deployment:verify` 成功后运行 `npm run research:validate -- RUN_DIRECTORY --complete`。protocolVersion=2 的完整性校验必须同时看到成功命令、deployment-verification.json、匹配的 commitSha、真实 Check 完成时间和正式域名证据；若校验失败，按失败报告，不得手工修饰档案以绕过校验。
 
 【最终报告】
 用中文简短报告：本次缺期列表、逐日期的 RUN_DIRECTORY 与 run attempt、六个来源渠道的 coverage 状态（尤其 X 计划/成功账号、目标日期候选、是否回退 XGo、中文媒体与漏报哨兵覆盖）、检索批次数、原始发现数、规范候选数、完成核验数、最终条目数、来源与论文占比、研究产物完整性校验、事务测试与回滚状态、Git 提交 SHA、推送尝试、Cloudflare 构建与正式域名验证尝试及网站链接。不要重复整份日报，不输出趋势观察。

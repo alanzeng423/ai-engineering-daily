@@ -43,6 +43,7 @@ function completeRun() {
   return {
     manifest: {
       schemaVersion: 1,
+      protocolVersion: 2,
       runId: "2026-07-22T09-30-00+08-00",
       targetDate,
       startedAt: "2026-07-22T01:30:00Z",
@@ -148,9 +149,32 @@ function completeRun() {
         { command: "npm run digest:validate -- content/inbox/2026-07-21.json", exitCode: 0 },
         { command: "npm run digest:publish -- content/inbox/2026-07-21.json", exitCode: 0 },
         { command: "npm test", exitCode: 0 },
+        { command: "npm run deployment:verify -- /tmp/run abcdef1", exitCode: 0 },
       ],
       git: { pushed: true, commitSha: "abcdef1" },
-      deployment: { status: "success", httpStatus: 200, verified: true },
+      deployment: {
+        status: "success",
+        httpStatus: 200,
+        verified: true,
+        verificationMethod: "scripts/verify-deployment.mjs",
+        evidenceFile: "deployment-verification.json",
+      },
+    },
+    deploymentVerification: {
+      schemaVersion: 1,
+      targetDate,
+      commitSha: "abcdef1",
+      status: "success",
+      completedAt: "2026-07-22T01:49:00Z",
+      check: {
+        status: "completed",
+        conclusion: "success",
+        completedAt: "2026-07-22T01:48:00Z",
+      },
+      production: {
+        root: { httpStatus: 200, matched: true },
+        today: { httpStatus: 200, matched: true },
+      },
     },
   };
 }
@@ -168,6 +192,7 @@ test("accepts the transactional publish command as publish plus test evidence", 
       exitCode: 0,
     },
     { command: "npm run digest:finalize -- /tmp/run abcdef1", exitCode: 0 },
+    { command: "npm run deployment:verify -- /tmp/run abcdef1", exitCode: 0 },
   ];
   assert.deepEqual(validateResearchArtifacts(run, { complete: true }), []);
 });
@@ -254,6 +279,18 @@ test("accepts a complete historical backfill with a baseline collection", () => 
   run.checks.commands = [
     { command: "npm run catalog:build", exitCode: 0 },
     { command: "npm test", exitCode: 0 },
+    { command: "npm run deployment:verify -- /tmp/run abcdef1", exitCode: 0 },
   ];
   assert.deepEqual(validateResearchArtifacts(run, { complete: true }), []);
+});
+
+test("rejects a manually claimed deployment success without script evidence", () => {
+  const run = completeRun();
+  run.checks.commands = run.checks.commands.filter(
+    (item) => !item.command.includes("deployment:verify"),
+  );
+  run.deploymentVerification = null;
+  const errors = validateResearchArtifacts(run, { complete: true });
+  assert.ok(errors.some((error) => error.includes("deployment:verify")));
+  assert.ok(errors.some((error) => error.includes("deployment-verification.json")));
 });

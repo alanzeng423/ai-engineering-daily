@@ -18,6 +18,7 @@
     "digest:transaction": "node scripts/publish-transaction.mjs",
     "digest:recover": "node scripts/recover-publication.mjs",
     "digest:finalize": "node scripts/finalize-publication.mjs",
+    "deployment:verify": "node scripts/verify-deployment.mjs",
     "catalog:build": "node scripts/rebuild-catalog.mjs",
     "sources:check": "node scripts/source-watchlist.mjs",
     "research:init": "node scripts/init-research-run.mjs",

@@ -13,5 +13,8 @@ test("daily automation bypasses an unavailable inherited loopback proxy", async 
   assert.match(prompt, /checks\.json/);
   assert.match(prompt, /events\.ndjson/);
   assert.match(prompt, /research:collect:x/);
+  assert.match(prompt, /deployment:verify/);
+  assert.match(prompt, /deployment-verification\.json/);
+  assert.match(prompt, /唯一允许写入部署成功状态/);
   assert.match(prompt, /不得修改用户的 shell 配置、Git 全局配置、系统网络设置或全局环境变量/);
 });

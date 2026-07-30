@@ -56,6 +56,7 @@ await mkdir(resolve(runDirectory, "source-candidates"), { recursive: true });
 const common = { schemaVersion: 1, targetDate };
 const manifest = {
   schemaVersion: 1,
+  protocolVersion: 2,
   runId,
   automationId: "ai",
   targetDate,
@@ -105,8 +106,11 @@ const files = {
       httpStatus: null,
       verified: false,
       verifiedAt: null,
+      verificationMethod: null,
+      evidenceFile: null,
     },
   },
+  "deployment-verification.json": null,
 };
 
 for (const [name, value] of Object.entries(files)) {

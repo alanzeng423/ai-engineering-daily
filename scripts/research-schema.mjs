@@ -79,6 +79,7 @@ export function validateResearchArtifacts(artifacts, options = {}) {
     selection,
     digest,
     checks,
+    deploymentVerification,
   } = artifacts;
 
   if (!isObject(manifest)) return ["manifest.json 必须是 JSON 对象"];
@@ -401,6 +402,51 @@ export function validateResearchArtifacts(artifacts, options = {}) {
     ) {
       errors.push("完整运行必须记录成功部署及正式域名 HTTP 200 验证");
     }
+    if ((manifest.protocolVersion ?? 1) >= 2) {
+      if (!successfulCommands.some((item) => item.command?.includes("deployment:verify"))) {
+        errors.push("protocolVersion 2 完整运行必须由 deployment:verify 成功收尾");
+      }
+      if (
+        checks.deployment?.verificationMethod !== "scripts/verify-deployment.mjs" ||
+        checks.deployment?.evidenceFile !== "deployment-verification.json"
+      ) {
+        errors.push("protocolVersion 2 部署状态必须来自确定性验证脚本");
+      }
+      if (!isObject(deploymentVerification)) {
+        errors.push("protocolVersion 2 缺少 deployment-verification.json");
+      } else {
+        if (
+          deploymentVerification.status !== "success" ||
+          deploymentVerification.targetDate !== targetDate ||
+          deploymentVerification.commitSha !== checks.git?.commitSha
+        ) {
+          errors.push("deployment-verification.json 与目标日期或 Git 提交不一致");
+        }
+        if (
+          deploymentVerification.check?.status !== "completed" ||
+          deploymentVerification.check?.conclusion !== "success" ||
+          !isIsoDateTime(deploymentVerification.check?.completedAt)
+        ) {
+          errors.push("deployment-verification.json 缺少真实完成且成功的 Cloudflare Check");
+        }
+        if (
+          deploymentVerification.production?.root?.httpStatus !== 200 ||
+          deploymentVerification.production?.root?.matched !== true ||
+          deploymentVerification.production?.today?.httpStatus !== 200 ||
+          deploymentVerification.production?.today?.matched !== true
+        ) {
+          errors.push("deployment-verification.json 缺少正式域名 root/today 内容匹配证据");
+        }
+        if (
+          !isIsoDateTime(deploymentVerification.completedAt) ||
+          !isIsoDateTime(manifest.finishedAt) ||
+          Date.parse(deploymentVerification.check?.completedAt) > Date.parse(deploymentVerification.completedAt) ||
+          Date.parse(deploymentVerification.completedAt) > Date.parse(manifest.finishedAt)
+        ) {
+          errors.push("部署 Check、正式域名验证与 run 完成时间顺序不合法");
+        }
+      }
+    }
   }
 
   return errors;
@@ -408,6 +454,15 @@ export function validateResearchArtifacts(artifacts, options = {}) {
 
 async function readJson(path) {
   return JSON.parse(await readFile(path, "utf8"));
+}
+
+async function readOptionalJson(path) {
+  try {
+    return await readJson(path);
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
 }
 
 export async function readResearchRun(runDirectory, options = {}) {
@@ -432,6 +487,7 @@ export async function readResearchRun(runDirectory, options = {}) {
     selection: await readJson(resolve(root, "selection.json")),
     digest: await readJson(resolve(root, "digest.json")),
     checks: await readJson(resolve(root, "checks.json")),
+    deploymentVerification: await readOptionalJson(resolve(root, "deployment-verification.json")),
   };
 
   return {
