@@ -1,13 +1,143 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-30T02:35:00.000Z",
-  "latestDigestDate": "2026-07-28",
-  "total": 95,
+  "generatedAt": "2026-07-30T02:43:00.000Z",
+  "latestDigestDate": "2026-07-29",
+  "total": 103,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-28"
+    "to": "2026-07-29"
   },
   "items": [
+    {
+      "category": "前沿治理",
+      "sourceType": "website",
+      "source": "Pacing the Frontier",
+      "publishedAt": "2026-07-29",
+      "readTime": "5 min",
+      "title": "多家实验室支持为极高速能力增长建立节奏控制工具",
+      "summary": "Pacing the Frontier 联署提出，当自动化研发显著加速前沿模型进展时，需要可验证机制调节推进速度并为社会准备留出时间。OpenAI 与 Anthropic 的官方原帖分别确认支持，并把递归自我改进研究、政府协调和开放社区参与列为背景。",
+      "why": "模型治理如果要影响工程决策，需要落到能力触发条件、测量工具和可审计的协调机制。",
+      "url": "https://www.pacingthefrontier.com/",
+      "tags": [
+        "模型治理",
+        "能力评测",
+        "风险控制"
+      ]
+    },
+    {
+      "category": "数据 Agent",
+      "sourceType": "blog",
+      "source": "LangChain",
+      "publishedAt": "2026-07-29",
+      "readTime": "8 min",
+      "title": "三人数据团队用 Agent 承接约四十倍请求量",
+      "summary": "LangChain 公开其内部数据 Agent 架构，报告系统处理的请求量约为三人数据团队直接承接能力的 40 倍。团队把精力转向模型、上下文和护栏，并以生产请求反馈改进可信度，而不是继续人工排队处理每个分析需求。",
+      "why": "生产数据 Agent 的核心指标应同时覆盖吞吐、上下文质量、护栏命中和人工升级率，避免只报告自动化次数。",
+      "url": "https://www.langchain.com/blog/agent-data-stack",
+      "tags": [
+        "数据分析",
+        "护栏",
+        "生产系统"
+      ]
+    },
+    {
+      "category": "Agent 运行环境",
+      "sourceType": "blog",
+      "source": "LangChain",
+      "publishedAt": "2026-07-29",
+      "readTime": "8 min",
+      "title": "Agent 的计算机需要同时解决隔离、控制、观测与迭代",
+      "summary": "LangChain 将 Agent 计算环境拆为四项系统要求：安全执行、控制权、可观测性，以及快速构建与迭代。文章把模型循环之外的文件系统、进程、网络和追踪接口视为统一运行时，而非临时工具集合。",
+      "why": "选用 Agent 沙箱或执行平台时，这四项可直接转成架构审查与验收清单。",
+      "url": "https://www.langchain.com/blog/agents-need-their-own-computer",
+      "tags": [
+        "沙箱隔离",
+        "可观测性",
+        "运行时"
+      ]
+    },
+    {
+      "category": "AI 密码分析",
+      "sourceType": "blog",
+      "source": "Anthropic",
+      "publishedAt": "2026-07-29",
+      "readTime": "9 min",
+      "title": "Claude Mythos Preview 协助发现密码算法弱点",
+      "summary": "Anthropic 报告 Claude Mythos Preview 参与分析 HAWK 与 AES 相关密码结构，并发布两份技术论文及 AES 推理链材料。团队还与 ETH Zurich、特拉维夫大学和海法大学合作构建 CryptanalysisBench，用于系统评估模型的密码分析能力。",
+      "why": "安全研究中的模型结论必须能回到攻击步骤、数学证据和独立基准；这套发布提供了可复核材料链。",
+      "url": "https://www.anthropic.com/research/discovering-cryptographic-weaknesses",
+      "tags": [
+        "密码分析",
+        "安全评测",
+        "Claude"
+      ]
+    },
+    {
+      "category": "代码安全",
+      "sourceType": "github",
+      "source": "OpenAI",
+      "publishedAt": "2026-07-29",
+      "readTime": "6 min",
+      "title": "Codex Security CLI 将仓库扫描与修复验证接入 CI",
+      "summary": "OpenAI 开源 Codex Security CLI 与 TypeScript SDK，可扫描仓库、跨运行跟踪发现、核验修复并把安全检查加入 CI/CD。项目提供 npm 安装与 npx 入口，当前定位为早期版本，便于团队在隔离环境中评估误报、修复质量和权限边界。",
+      "why": "Coding Agent 的安全能力需要以版本化发现、修复复验和流水线门禁衡量，而不只是一次性代码审查。",
+      "url": "https://github.com/openai/codex-security",
+      "tags": [
+        "Codex",
+        "静态分析",
+        "CI/CD",
+        "漏洞修复"
+      ]
+    },
+    {
+      "category": "供应链安全",
+      "sourceType": "blog",
+      "source": "GitHub Blog",
+      "publishedAt": "2026-07-29",
+      "readTime": "6 min",
+      "title": "GitHub 给维护者列出六项可立即启用的安全设置",
+      "summary": "GitHub 面向开源维护者整理六项仓库安全设置，目标是提高攻击成本并保护下游依赖方。官方同时明确这些设置不能消除所有风险，因此应与分支保护、密钥管理、依赖审查和响应流程共同执行。",
+      "why": "Agent 自动提交和依赖更新扩大了仓库攻击面；平台原生设置可作为最低供应链防线。",
+      "url": "https://github.blog/security/6-security-settings-every-github-maintainer-should-enable-this-week/",
+      "tags": [
+        "GitHub",
+        "供应链安全",
+        "仓库治理"
+      ]
+    },
+    {
+      "category": "Agent 安全事件",
+      "sourceType": "x",
+      "source": "Hugging Face",
+      "publishedAt": "2026-07-29",
+      "readTime": "7 min",
+      "title": "Hugging Face 公开自治 Agent 入侵的完整技术时间线",
+      "summary": "Hugging Face 公布持续 4.5 天的入侵技术时间线、17,613 条攻击动作的交互回放，以及使用开放模型辅助防御的过程。链接博客在本次直连中不可访问，因此最终保留包含独有技术范围和一手披露的官方原帖，并在研究档案中记录失败访问。",
+      "why": "真实 Agent 安全事故需要保留动作级时间线、基础设施边界和防御证据，才能转化为沙箱与监控回归用例。",
+      "url": "https://x.com/ClementDelangue/status/2082201245813514613",
+      "tags": [
+        "事件响应",
+        "审计日志",
+        "沙箱隔离"
+      ]
+    },
+    {
+      "category": "推理基准",
+      "sourceType": "x",
+      "source": "vLLM",
+      "publishedAt": "2026-07-29",
+      "readTime": "4 min",
+      "title": "vLLM 用公开镜像复现 Kimi K3 每秒 464 token 解码",
+      "summary": "vLLM 报告 Kimi K3 配合 DSpark，在 4×4 GB300、batch size 1 的低熵推理负载上达到每秒 464 token。团队给出公开容器镜像与 draft model，使吞吐结果可以在明确硬件和工作负载条件下复测。",
+      "why": "推理性能数字只有绑定镜像、硬件、batch 与负载分布才可用于选型；该发布提供了这些关键复现条件。",
+      "url": "https://x.com/vllm_project/status/2082267336279814173",
+      "tags": [
+        "vLLM",
+        "推测解码",
+        "可复现基准",
+        "Kimi K3"
+      ]
+    },
     {
       "category": "开放权重治理",
       "sourceType": "blog",
