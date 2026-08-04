@@ -1,13 +1,115 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-30T02:43:00.000Z",
-  "latestDigestDate": "2026-07-29",
-  "total": 103,
+  "generatedAt": "2026-08-04T01:45:44.585Z",
+  "latestDigestDate": "2026-07-30",
+  "total": 109,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-29"
+    "to": "2026-07-30"
   },
   "items": [
+    {
+      "category": "Agent 评测",
+      "sourceType": "x",
+      "source": "OpenAI",
+      "publishedAt": "2026-07-30",
+      "readTime": "4 min",
+      "title": "两项 API 设置让 ARC-AGI-3 得分增至三倍",
+      "summary": "OpenAI 调查 GPT-5.6 Sol 在 ARC-AGI-3 上表现不佳的原因，发现评测 Harness 没有保留模型在长任务中已经学到的状态。启用 reasoning retention 与 context compaction 后，官方称得分增至三倍，同时输出 token 减少到原来的六分之一；团队强调 benchmark 同时测量模型、API 设置、Harness 与提示。",
+      "why": "评测长运行 Agent 时，必须固定并披露推理保留与压缩策略，否则分数差异可能来自 Harness，而不是基础模型。",
+      "url": "https://x.com/OpenAI/status/2082616641834422740",
+      "tags": [
+        "ARC-AGI",
+        "Reasoning Retention",
+        "上下文压缩",
+        "Benchmark"
+      ]
+    },
+    {
+      "category": "会话可迁移性",
+      "sourceType": "blog",
+      "source": "Earendil Engineering",
+      "publishedAt": "2026-07-30",
+      "readTime": "8 min",
+      "title": "推理服务的会话状态正在越过可导出 transcript",
+      "summary": "Earendil 分析推理 API 从无状态输入输出转向服务端持有提示缓存、推理状态与压缩上下文后的锁定风险。文章主张会话的语义记录应包含指令、消息、工具调用和工具结果，使另一个足够强的模型能够理解既有过程并接手，而不是把关键状态隐蔽地留在单一厂商系统中。",
+      "why": "构建长运行 Agent 时，应把可导出会话记录与服务端优化状态分开设计，否则模型或供应商切换会丢失可审计性和恢复能力。",
+      "url": "https://earendil.com/posts/session-portability/",
+      "tags": [
+        "会话状态",
+        "供应商切换",
+        "上下文工程",
+        "可审计性"
+      ]
+    },
+    {
+      "category": "Agent 运行环境",
+      "sourceType": "blog",
+      "source": "Cursor",
+      "publishedAt": "2026-07-30",
+      "readTime": "7 min",
+      "title": "Cursor 把云端开发环境当作 Agent 产品来维护",
+      "summary": "Cursor 公开其 cloud agent 环境设计：为 Agent 提供可运行测试的独立云端计算机，并让环境尽量匹配本地开发。团队将环境接口简化、自愈与持续改进视为 Agent 体验的一部分；官方原帖称云 Agent 产生的合并 PR 占比已从去年 12 月的 10% 上升到 56%。",
+      "why": "这把长任务成功率与开发环境可靠性直接联系起来，可用于设计 Coding Agent 的镜像、依赖、测试和自愈机制。",
+      "url": "https://cursor.com/blog/cloud-agent-environment",
+      "tags": [
+        "Coding Agent",
+        "云端开发",
+        "自愈环境",
+        "测试执行"
+      ]
+    },
+    {
+      "category": "具身智能",
+      "sourceType": "blog",
+      "source": "Google DeepMind",
+      "publishedAt": "2026-07-30",
+      "readTime": "8 min",
+      "title": "Gemini Robotics 2 将全身控制、灵巧操作与多机器人协作合并",
+      "summary": "Google DeepMind 发布 Gemini Robotics 2 系列，为不同机器人平台提供全身控制、五指灵巧操作和多机器人协作。其 ER 2 作为高层具身推理模型，负责观察环境、规划动作、协调视觉—语言—动作模型并追踪执行进度，使机器人可完成多步骤任务、在失败后自我修正并适应新情境。",
+      "why": "该系统清楚展示了高层规划模型与低层动作模型的分层方式，也为评估具身 Agent 的长任务恢复和跨硬件泛化提供了具体对象。",
+      "url": "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/",
+      "tags": [
+        "具身推理",
+        "机器人控制",
+        "多机器人",
+        "任务规划"
+      ]
+    },
+    {
+      "category": "推理效率",
+      "sourceType": "x",
+      "source": "OpenAI",
+      "publishedAt": "2026-07-30",
+      "readTime": "3 min",
+      "title": "GPT-5.6 Sol 用自身优化生产推理栈",
+      "summary": "OpenAI 称其在部署后使用 GPT-5.6 Sol 改进自身推理基础设施。官方给出的生产结果包括：GPU kernel 优化让服务成本降低 20%，改进 speculative decoding 后 token 生成效率提高 15% 以上；这些优化同时作用于 inference 与 agent loop。",
+      "why": "这是一组直接来自生产栈的量化证据，说明 Coding Agent 的价值可以延伸到内核和推测解码优化，而不仅是应用代码生成。",
+      "url": "https://x.com/OpenAI/status/2082577278450676080",
+      "tags": [
+        "GPU Kernel",
+        "推测解码",
+        "Codex",
+        "生产推理"
+      ]
+    },
+    {
+      "category": "实验可复现性",
+      "sourceType": "github",
+      "source": "Gradio / Trackio",
+      "publishedAt": "2026-07-30",
+      "readTime": "5 min",
+      "title": "Trackio Logbooks 把实验代码、Agent 轨迹与制品打包为静态记录",
+      "summary": "Trackio 0.34.0 发布 Logbooks，用优化后的静态 HTML bundle 保存 AI 实验。它可自动记录代码、Agent 轨迹与相关制品，使实验结果能够独立查看、归档和复现，而不只依赖在线追踪服务中的临时运行状态。",
+      "why": "对 Agent 评测和调试管线，这提供了低耦合的审计制品，可作为 CI 附件、回归样本和跨团队复核材料。",
+      "url": "https://github.com/gradio-app/trackio/blob/main/docs/source/logbooks.md",
+      "tags": [
+        "实验追踪",
+        "Agent 轨迹",
+        "静态制品",
+        "可复现性"
+      ]
+    },
     {
       "category": "前沿治理",
       "sourceType": "website",
