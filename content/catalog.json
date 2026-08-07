@@ -1,13 +1,117 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-07T01:43:40.000Z",
-  "latestDigestDate": "2026-08-01",
-  "total": 122,
+  "generatedAt": "2026-08-07T01:55:00.000Z",
+  "latestDigestDate": "2026-08-02",
+  "total": 128,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-08-01"
+    "to": "2026-08-02"
   },
   "items": [
+    {
+      "category": "多模态编码",
+      "sourceType": "x",
+      "source": "Andrej Karpathy",
+      "publishedAt": "2026-08-02",
+      "readTime": "5 min",
+      "title": "两小时长时编码实验暴露模型视觉自检瓶颈",
+      "summary": "实验给模型约一百万 token 预算，让其根据一段小说文本生成 Three.js 场景；模型运行约两小时并写出约 5500 行代码。结果能够程序化渲染故事，但模型只能缓慢截取不同时间点的画面进行检查，留下多处瑕疵。作者据此指出，视频感知和在生成世界中实际游玩的能力仍限制模型审计自身工作。",
+      "why": "长时编码任务的瓶颈正从代码生成转向可观察、可交互的自检回路；测试基础设施需要向视频和运行时行为验证扩展。",
+      "url": "https://x.com/karpathy/status/2083749667410727319",
+      "tags": [
+        "Three.js",
+        "长时任务",
+        "多模态",
+        "自我验证"
+      ]
+    },
+    {
+      "category": "Agent 评测",
+      "sourceType": "x",
+      "source": "Vtrivedy",
+      "publishedAt": "2026-08-02",
+      "readTime": "5 min",
+      "title": "Agent 评测同时检查环境终态与执行轨迹",
+      "summary": "该工程实践把 Agent 评测分成两类信号：任务前后环境状态，以及对完整轨迹的判断。终态验证需要在包含文件、工具、安全边界和指令的容器化环境中运行，同时允许预期之外但正确的结果。轨迹侧则检查成本、延迟、可解释性和是否通过作弊完成任务。",
+      "why": "只判最终答案会漏掉越权、作弊和高成本路径；这套划分可直接转化为评测基架的状态断言与轨迹审计层。",
+      "url": "https://x.com/Vtrivedy10/status/2083701846816817297",
+      "tags": [
+        "评测环境",
+        "轨迹分析",
+        "容器化",
+        "成本优化"
+      ]
+    },
+    {
+      "category": "编码实践",
+      "sourceType": "github",
+      "source": "thebuggeddev",
+      "publishedAt": "2026-08-02",
+      "readTime": "5 min",
+      "title": "Codex 将 3D 解剖应用资产从约 900 MB 压缩到 28.6 MB",
+      "summary": "该开源项目用 Three.js 构建交互式人体解剖应用，并以设计图和逐个生成的 3D 器官模型驱动 Codex 开发。初版单个模型约 120–150 MB、帧率约 16 fps；迭代后单模型降至约 2–5.5 MB，总资产从约 900 MB 降到 28.6 MB，并改为按需加载。项目还包含器官定位插图与交互热点。",
+      "why": "案例给出了可量化的 Agent 辅助前端性能优化路径，说明生成式开发仍需要围绕资产预算、帧率和延迟加载进行多轮验证。",
+      "url": "https://github.com/thebuggeddev/anatomy",
+      "tags": [
+        "Codex",
+        "Three.js",
+        "性能优化",
+        "按需加载"
+      ]
+    },
+    {
+      "category": "技能路由",
+      "sourceType": "arxiv",
+      "source": "Ortal Ashkenazi 等",
+      "publishedAt": "2026-08-02",
+      "readTime": "8 min",
+      "title": "Don't Offer What Can't Be Done: Deterministic Executability Gating for LLM Skill Selection at Scale",
+      "subtitle": "在语义召回之后用确定性门禁过滤不可执行技能",
+      "summary": "大规模技能库中，语义相关不代表技能在当前账户状态下可执行。论文介绍 Wix 客服助手 Helpmate 的三阶段选择管线：先用高召回语义匹配定位十技能领域族，再由确定性门禁依据账户状态移除不可执行项。该设计把能力可用性从模型判断中分离出来。",
+      "why": "工具型 Agent 应把权限、资源和前置条件检查实现为确定性代码，避免模型向用户承诺当前状态下无法完成的操作。",
+      "url": "https://arxiv.org/abs/2608.01050v1",
+      "tags": [
+        "工具调用",
+        "技能路由",
+        "确定性验证",
+        "客服 Agent"
+      ]
+    },
+    {
+      "category": "错误分析",
+      "sourceType": "github",
+      "source": "Shreya Shankar",
+      "publishedAt": "2026-08-02",
+      "readTime": "4 min",
+      "title": "Error Discovery Skill 把 Agent 轨迹错误分析做成可复用技能",
+      "summary": "该开源技能面向 LLM 轨迹数据集执行交互式错误分析。仓库描述的流程包括构建审阅界面、监控人工标注、归纳失败模式，并据此提出新的测试样本。它把一次性的人工排错步骤封装为可重复运行的 Agent 技能。",
+      "why": "评测团队可用它把失败分类与新样本生成连成闭环，减少每轮回归测试重新搭建分析工具的成本。",
+      "url": "https://github.com/shreyashankar/error-discovery-skill",
+      "tags": [
+        "错误分析",
+        "评测数据",
+        "人工标注",
+        "测试生成"
+      ]
+    },
+    {
+      "category": "时间感知评测",
+      "sourceType": "arxiv",
+      "source": "Tezan Sahu 等",
+      "publishedAt": "2026-08-02",
+      "readTime": "8 min",
+      "title": "What Could the Agent See at 19:05? Generating Temporal Enterprise Scenarios from Real Research and Replaying Them to Evaluate Agents",
+      "subtitle": "用可回放的时间场景评测企业 Agent 当时可见的信息",
+      "summary": "企业 Agent 跨多个应用工作时，数据和权限持续变化，答案只在特定时刻的可见状态下成立。论文指出，单一静态快照通常只代表回合结束状态，无法评价此前每个时间点。作者从真实研究生成时间化企业场景并进行回放，使问题、可见信息与正确答案绑定到事件发生时刻。",
+      "why": "对邮件、日历、CRM 等跨应用 Agent，回归测试需要重放状态变化和权限边界，而不能只检查最终数据库快照。",
+      "url": "https://arxiv.org/abs/2608.01042v1",
+      "tags": [
+        "Agent 评测",
+        "时间序列",
+        "企业应用",
+        "权限控制"
+      ]
+    },
     {
       "category": "安全监控",
       "sourceType": "arxiv",
