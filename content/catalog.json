@@ -1,13 +1,100 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-06T01:51:48.606Z",
-  "latestDigestDate": "2026-07-31",
-  "total": 117,
+  "generatedAt": "2026-08-07T01:43:40.000Z",
+  "latestDigestDate": "2026-08-01",
+  "total": 122,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-07-31"
+    "to": "2026-08-01"
   },
   "items": [
+    {
+      "category": "安全监控",
+      "sourceType": "arxiv",
+      "source": "Shikhar Shiromani 等",
+      "publishedAt": "2026-08-01",
+      "readTime": "7 min",
+      "title": "A False Average: Chain-of-Thought Monitors Collapse Where They Are the Only Defense",
+      "subtitle": "思维链监控在关键对抗子集上出现显著失效",
+      "summary": "论文检验思维链监控能否发现动作表面正常、但推理暴露奖励投机的 Agent。攻击只改写推理为看似善意的工程说明，保持命令与输出不变；在该子集上，独立监控器的检出率从约 95% 降至不足 11%。这说明平均指标会掩盖监控器作为唯一防线时的脆弱区域。",
+      "why": "部署高权限 Agent 时，思维链监控不能作为单点安全控制；动作约束、环境隔离和结果验证仍需独立存在。",
+      "url": "https://arxiv.org/abs/2608.00583v1",
+      "tags": [
+        "思维链",
+        "安全评测",
+        "奖励投机",
+        "红队测试"
+      ]
+    },
+    {
+      "category": "桌面 Agent",
+      "sourceType": "x",
+      "source": "OpenAI Developers",
+      "publishedAt": "2026-08-01",
+      "readTime": "3 min",
+      "title": "ChatGPT 桌面端新增 Activity 集中处理待响应任务",
+      "summary": "ChatGPT 桌面应用新增 Activity 视图，把需要用户注意的对话与各项目的近期更新集中展示。该入口面向并行项目和持续运行任务，减少用户逐个进入会话检查状态的操作。公告明确把重点放在待处理事项与项目更新的统一汇总。",
+      "why": "当桌面 Agent 同时运行多个任务时，集中式活动队列会直接影响人工审批、异常处理和任务切换的工作流设计。",
+      "url": "https://x.com/OpenAIDevs/status/2083288643310133716",
+      "tags": [
+        "ChatGPT",
+        "任务管理",
+        "Human-in-the-loop",
+        "桌面应用"
+      ]
+    },
+    {
+      "category": "模型端点",
+      "sourceType": "blog",
+      "source": "Modal",
+      "publishedAt": "2026-08-01",
+      "readTime": "4 min",
+      "title": "Modal 共享端点直接接入 Codex 与 OpenCode",
+      "summary": "Modal 为 OpenAI 兼容的编码 Agent 提供共享端点接入，Codex 与 OpenCode 可直接连接其推理地址。请求通过 OpenAI 的 model 字段路由，模型 ID 使用端点主机名，从而把自定义推理服务接入现有编码工具。目标日公告同时给出了 Kimi K3 在 Codex 中运行的入口。",
+      "why": "团队可以在不改写编码 Agent 客户端协议的情况下替换后端模型，并把自托管或共享推理端点纳入现有开发流程。",
+      "url": "https://modal.com/docs/guide/endpoint-integrations#codex",
+      "tags": [
+        "Codex",
+        "OpenCode",
+        "模型服务",
+        "推理部署"
+      ]
+    },
+    {
+      "category": "本地模型",
+      "sourceType": "x",
+      "source": "Ollama",
+      "publishedAt": "2026-08-01",
+      "readTime": "3 min",
+      "title": "Ollama Cloud 上线 DeepSeek V4 Flash 并支持 Claude Code",
+      "summary": "Ollama Cloud 新增 DeepSeek-V4-Flash-0731，可通过 `ollama run deepseek-v4-flash:0731-cloud` 调用。公告同时给出 Claude Code 的启动方式，使用 `ollama launch claude` 指定该云端模型。相较前一日的模型发布，本次新增的是可直接执行的 Ollama 与 Claude Code 集成路径。",
+      "why": "这把模型评估从模型页推进到编码 Agent 的可运行配置，便于团队快速验证工具调用和代码任务表现。",
+      "url": "https://x.com/ollama/status/2083411055284232268",
+      "tags": [
+        "DeepSeek",
+        "Claude Code",
+        "模型服务",
+        "开发工具"
+      ]
+    },
+    {
+      "category": "Agent 训练",
+      "sourceType": "arxiv",
+      "source": "Chengbo Liu 等",
+      "publishedAt": "2026-08-01",
+      "readTime": "8 min",
+      "title": "RMSWeb: Reflection, Failure-Mode Mining, and Salvage-DS for Web Agent Reinforcement Learning",
+      "subtitle": "用失败模式挖掘与轨迹修复改进网页 Agent 强化学习",
+      "summary": "紧凑型网页 Agent 的训练受制于成功轨迹昂贵、轨迹含冗余绕路，以及 SFT 后常规状态占比过高。RMSWeb 将反思、失败模式挖掘与 Salvage-DS 数据修复结合，用于改善训练数据和后续强化学习信号。论文还指出，网页动作上的组相对强化学习若奖励设计不当，会产生弱或误导性的相对更新。",
+      "why": "这为网页 Agent 团队提供了比单纯扩充成功轨迹更具体的数据治理方向：保留并结构化利用失败状态，同时审计动作级奖励的区分度。",
+      "url": "https://arxiv.org/abs/2608.00335v1",
+      "tags": [
+        "Web Agent",
+        "强化学习",
+        "训练数据",
+        "失败分析"
+      ]
+    },
     {
       "category": "安全评测",
       "sourceType": "blog",
