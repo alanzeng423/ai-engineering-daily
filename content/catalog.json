@@ -1,13 +1,81 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-08T01:42:00.000Z",
-  "latestDigestDate": "2026-08-03",
-  "total": 133,
+  "generatedAt": "2026-08-08T01:57:00.000Z",
+  "latestDigestDate": "2026-08-04",
+  "total": 137,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-08-03"
+    "to": "2026-08-04"
   },
   "items": [
+    {
+      "category": "Coding Agent 运行时",
+      "sourceType": "x",
+      "source": "Cline",
+      "publishedAt": "2026-08-04",
+      "readTime": "5 min",
+      "title": "Cline 让开放权重模型保留验证型工具行为",
+      "summary": "Cline 解释其 harness 对 DeepSeek、GLM 和 Kimi 等开放权重模型的适配：这些模型在强化学习后倾向于花更多 token 运行测试、检查构建并重读 diff。运行时没有过早压缩这些验证步骤，而是让模型按训练出的工具行为完成闭环。Cline 称内部基准中，仅通过顺应该行为的 harness 调整即可比对照实现提升约 20%。",
+      "why": "评测模型时需要同时固定 harness、token 策略和工具反馈；为追求表面效率裁掉验证动作，可能直接改变模型的有效能力。",
+      "url": "https://x.com/cline/status/2084359007029141528",
+      "tags": [
+        "Coding Agent",
+        "开放权重",
+        "工具调用",
+        "自我验证"
+      ]
+    },
+    {
+      "category": "文档自动化",
+      "sourceType": "blog",
+      "source": "GitHub",
+      "publishedAt": "2026-08-04",
+      "readTime": "7 min",
+      "title": "GitHub 用 Agentic Workflows 同步跨仓库代码与文档",
+      "summary": "Aspire 团队把功能合并事件转换成跨仓库文档 PR：工作流读取代码变化，生成对应文档修改，并以受限权限提交到文档仓库，最后交由领域专家审核。GitHub 公布的结果是 82 个自动生成的 PR 全部合并，中位合并时间为 44.8 小时。流程保留 PR、权限边界和人工评审，使自动化结果进入原有治理路径。",
+      "why": "跨仓库 Agent 应以最小权限、可审查 PR 和明确责任人连接代码与文档，避免把内容同步变成不可追踪的后台写入。",
+      "url": "https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/",
+      "tags": [
+        "GitHub Actions",
+        "文档工程",
+        "跨仓库协作",
+        "权限控制"
+      ]
+    },
+    {
+      "category": "端侧 Agent",
+      "sourceType": "x",
+      "source": "Liquid AI",
+      "publishedAt": "2026-08-04",
+      "readTime": "5 min",
+      "title": "LFM2.5-2.6B 把多步工具调用放到端侧",
+      "summary": "Liquid AI 发布 LFM2.5-2.6B，可在手机、笔记本、PC 和机器人上本地规划、调用工具并完成多步任务。模型使用约 34T token 预训练，提供 128K 上下文与开放权重许可，并可在单张 GPU 上定制。官方给出的 ToolSandbox、Multi-IF 和 IFStruct 分数分别为 77.83、80.07 和 85.49，均高于其列出的更大模型对照。",
+      "why": "端侧 Agent 可以把敏感数据留在设备内，并把高频调用的边际推理成本压低；工程判断仍应在目标硬件上复测延迟、内存与工具成功率。",
+      "url": "https://x.com/liquidai/status/2084640701669613906",
+      "tags": [
+        "端侧推理",
+        "工具调用",
+        "隐私保护",
+        "模型微调"
+      ]
+    },
+    {
+      "category": "Agent 训练基础设施",
+      "sourceType": "blog",
+      "source": "Microsoft Research",
+      "publishedAt": "2026-08-04",
+      "readTime": "8 min",
+      "title": "Orchard 用同一环境服务训练与评测多类 Agent",
+      "summary": "Microsoft Research 开源 Orchard，核心 Orchard Env 是运行在 Kubernetes 上的可复用隔离环境服务，把数据采集、强化学习 rollout 和评测连接到同一基础设施。相同服务可承载软件工程、网页导航和个人助理任务，并可直接接入 Codex、OpenClaw 与 ZeroClaw 等部署 harness。官方报告 Orchard-SWE 使用约 30 亿活跃参数达到 SWE-bench Verified 69.7%，加入价值模型重排后为 73.0%。",
+      "why": "研究团队可复用环境、数据管线和评测协议，把模型差异与基础设施差异分开，降低 Agent 实验复现成本。",
+      "url": "https://www.microsoft.com/en-us/research/blog/orchard-an-open-framework-for-scalable-agentic-ai/",
+      "tags": [
+        "强化学习",
+        "SWE-bench",
+        "Kubernetes",
+        "评测环境"
+      ]
+    },
     {
       "category": "多 Agent 编排",
       "sourceType": "x",
