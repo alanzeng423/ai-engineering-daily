@@ -1,13 +1,98 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-07T01:55:00.000Z",
-  "latestDigestDate": "2026-08-02",
-  "total": 128,
+  "generatedAt": "2026-08-08T01:42:00.000Z",
+  "latestDigestDate": "2026-08-03",
+  "total": 133,
   "coverage": {
     "from": "2024-05-07",
-    "to": "2026-08-02"
+    "to": "2026-08-03"
   },
   "items": [
+    {
+      "category": "多 Agent 编排",
+      "sourceType": "x",
+      "source": "swyx",
+      "publishedAt": "2026-08-03",
+      "readTime": "3 min",
+      "title": "用 Codex 线程队列表达平台与产品的依赖关系",
+      "summary": "swyx 在同时开发 Forge 平台和其上层项目时，用 Codex 的线程引用与排队机制表达跨仓库依赖：产品任务先排队，等待平台能力完成后继续推进。这个实践暴露了更一般的编排需求——当平台与产品相互阻塞时，多 Agent 运行时应自动传递解除阻塞的状态，而不是依赖人反复切换上下文。",
+      "why": "跨仓库 Agent 不只需要并行执行，还需要显式依赖、可恢复队列和完成事件传播，否则并发会放大等待与状态漂移。",
+      "url": "https://x.com/swyx/status/2083993378258288976",
+      "tags": [
+        "Codex",
+        "任务队列",
+        "跨仓库协作",
+        "依赖管理"
+      ]
+    },
+    {
+      "category": "软件工程方法",
+      "sourceType": "github",
+      "source": "David Bau",
+      "publishedAt": "2026-08-03",
+      "readTime": "8 min",
+      "title": "Engineering Machine-Written Code 公开机器编写代码的工程教材",
+      "summary": "David Bau 公开面向大型、可靠 LLM 编码系统的教材手稿与研究仓库。仓库把章节正文、可编辑图源、章节来源图谱、事实核查和第三方源码的固定提交记录分开管理；构建链使用 Pandoc、XeLaTeX 与 Make 生成 PDF，并提供完整性检查。它把机器编写代码的问题放回需求、架构、验证和可复现构建的完整软件工程流程。",
+      "why": "团队引入 Coding Agent 时，可以用该仓库的来源钉扎、事实核查和确定性构建方式约束文档与代码产物，而不是只优化生成速度。",
+      "url": "https://github.com/davidbau/emwc",
+      "tags": [
+        "Coding Agent",
+        "可复现构建",
+        "事实核查",
+        "软件架构"
+      ]
+    },
+    {
+      "category": "人机审批",
+      "sourceType": "github",
+      "source": "Smitner Studio",
+      "publishedAt": "2026-08-03",
+      "readTime": "7 min",
+      "title": "Facet 把 Agent 计划中的审批回传为类型化数据",
+      "summary": "Facet 是一个本地单二进制工具：Agent 写入 Markdown，Facet 在浏览器中渲染计划、风险表和决策门，再把人的点击作为类型化数据回传。它直接读取磁盘文件，不要求账户或远端工作区，并针对终端长文本中审批范围容易被误解的问题，把每个决策绑定到具体阶段。README 还给出序列流程、示例计划与 token 成本测量。",
+      "why": "高风险 Coding Agent 工作流应把审批对象、范围和结果结构化，避免一句自然语言批准被错误扩大到整个计划。",
+      "url": "https://github.com/Smitner-Studio/facet",
+      "tags": [
+        "Coding Agent",
+        "人工审批",
+        "类型化接口",
+        "本地工具"
+      ]
+    },
+    {
+      "category": "文档解析",
+      "sourceType": "website",
+      "source": "LlamaIndex",
+      "publishedAt": "2026-08-03",
+      "readTime": "6 min",
+      "title": "LiteParse 直接提取 PDF 表单、标注与结构树",
+      "summary": "LiteParse 新增按需提取表单字段、复选框状态、标注、嵌入图像、矢量图形、标签结构树、字形元数据和词级边界框。默认路径只返回文本、几何与页面元数据，各类额外结构通过独立开关启用，以控制解析耗时和输出体积。页面复杂度信号再识别扫描页、多栏文本、表格和密集图形，用于把确需模型的页面路由到其他解析器。",
+      "why": "文档管线可先利用 PDF 的确定性结构，再把视觉模型预算集中到复杂页面，降低成本并提高字段级可验证性。",
+      "url": "https://developers.llamaindex.ai/liteparse/guides/extraction/",
+      "tags": [
+        "PDF",
+        "结构化数据",
+        "工具路由",
+        "成本优化"
+      ]
+    },
+    {
+      "category": "长时自主开发",
+      "sourceType": "x",
+      "source": "Qwen",
+      "publishedAt": "2026-08-03",
+      "readTime": "4 min",
+      "title": "Qwen3.8-Max 把自主编码延伸到十天以上",
+      "summary": "Qwen 发布 2.4T 参数的 Qwen3.8-Max，并宣布后续开放权重。官方给出的工程轨迹包括从空目录开始持续十天以上完成生产项目、在芯片设计任务中闭环优化超过 500 轮，以及面向视觉反馈的持续规划与自我纠正。API 定价为输入每百万 token 2 美元、输出 6 美元，隐式缓存输入为 0.25 美元。",
+      "why": "长时编码系统的评测需要覆盖多日状态演化、失败恢复和产物审计，不能只看单次基准分数。",
+      "url": "https://x.com/Alibaba_Qwen/status/2084100707423289643",
+      "tags": [
+        "长时任务",
+        "代码生成",
+        "多模态",
+        "成本优化"
+      ]
+    },
     {
       "category": "多模态编码",
       "sourceType": "x",
